@@ -29,7 +29,9 @@
     "@semantic-release/github": "^11.0.0"
   },
   "pi": {
-    "extensions": ["./index.ts"],
+    "extensions": [
+      "./index.ts"
+    ],
     "image": "https://raw.githubusercontent.com/user/pi-email-client/main/screenshot.png"
   }
 }
