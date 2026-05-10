@@ -100,6 +100,18 @@ export function formatEmailBody(
     }
   }
 
+  if (email.pdfTexts && email.pdfTexts.length > 0) {
+    for (const pdf of email.pdfTexts) {
+      parts.push("");
+      parts.push(`--- PDF: ${pdf.filename} ---`);
+      const pdfBody =
+        pdf.text.length > 5000
+          ? pdf.text.substring(0, 5000) + "\n\n[... PDF truncated ...]"
+          : pdf.text;
+      parts.push(pdfBody || "(no text extracted)");
+    }
+  }
+
   const body =
     email.text.length > 8000
       ? email.text.substring(0, 8000) + "\n\n[... email truncated ...]"

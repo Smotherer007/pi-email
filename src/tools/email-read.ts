@@ -6,13 +6,14 @@ import { Type } from "typebox";
 import { readEmail } from "../clients/imap-client";
 import { getConfigOrThrow } from "../config";
 import { formatEmailBody } from "../formatting/formatters";
-import type { AttachmentInfo, EmailBody, EmailConfig, ReadParams } from "../types";
+import { extractPdfsFromAttachments } from "../pdf-reader";
+import type { AttachmentInfo, EmailBody, EmailConfig, PdfContent, ReadParams } from "../types";
 
 export const EmailReadTool = {
   name: "email_read",
   label: "Read Email",
   description:
-    "Read the full body of a specific email by UID. Returns subject, from, date, and the full text body. Use downloadDir to save attachments.",
+    "Read the full body of a specific email by UID. Returns subject, from, date, and the full text body. Use downloadDir to save attachments. PDF attachments are automatically extracted and their text content included.",
   parameters: Type.Object({
     uid: Type.Number({ description: "Email UID from email_fetch" }),
     mailbox: Type.Optional(
@@ -48,6 +49,12 @@ export const EmailReadTool = {
       }),
     );
 
+    // Extract text from PDF attachments
+    let pdfTexts: PdfContent[] = [];
+    if (savedFiles.length > 0) {
+      pdfTexts = [...(await extractPdfsFromAttachments(savedFiles))];
+    }
+
     const body: EmailBody = {
       uid: params.uid,
       from: parsed.from?.text || "",
@@ -57,6 +64,7 @@ export const EmailReadTool = {
       date: parsed.date?.toISOString() || "",
       text: parsed.text || "(no text content)",
       attachments,
+      pdfTexts,
     };
 
     const text = formatEmailBody(body, savedFiles);
@@ -67,6 +75,7 @@ export const EmailReadTool = {
         uid: params.uid,
         subject: body.subject,
         attachmentCount: attachments.length,
+        pdfCount: pdfTexts.length,
         savedFiles,
       },
     };

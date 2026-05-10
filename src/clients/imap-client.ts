@@ -43,11 +43,15 @@ export function decodeHeader(value: string | undefined | null): string {
           return Buffer.from(text, "base64").toString("utf-8");
         }
         // Q encoding: =xx hex, _ -> space
-        return text
+        // Replace _ with space, then convert each =XX hex pair to
+        // the corresponding byte. Interpret the result as latin-1
+        // and convert to UTF-8 (so multi-byte UTF-8 sequences work).
+        const raw = text
           .replace(/_/g, " ")
           .replace(/=([0-9A-Fa-f]{2})/g, (_m: string, hex: string) =>
             String.fromCharCode(parseInt(hex, 16)),
           );
+        return Buffer.from(raw, "latin1").toString("utf-8");
       },
     );
   } catch {

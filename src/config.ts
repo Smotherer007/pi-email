@@ -5,8 +5,8 @@
  * Reads/writes from ~/.pi/email-config.json.
  */
 
-import type { EmailConfig } from "../types";
-import { EmailNotConfiguredError } from "../types";
+import type { EmailConfig } from "./types";
+import { EmailNotConfiguredError } from "./types";
 
 // ── Mutable state ───────────────────────────────────────────────────────────
 
@@ -57,4 +57,9 @@ export function getConfigOrThrow(): EmailConfig {
     throw new EmailNotConfiguredError();
   }
   return currentConfig;
+}
+
+/** @internal Reset state — for testing only */
+export function _resetForTesting(): void {
+  currentConfig = null;
 }

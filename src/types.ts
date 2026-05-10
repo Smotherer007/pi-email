@@ -51,6 +51,12 @@ export interface EmailBody {
   readonly date: string;
   readonly text: string;
   readonly attachments: ReadonlyArray<AttachmentInfo>;
+  readonly pdfTexts?: ReadonlyArray<PdfContent>;
+}
+
+export interface PdfContent {
+  readonly filename: string;
+  readonly text: string;
 }
 
 export interface AttachmentInfo {
