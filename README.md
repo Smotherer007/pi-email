@@ -8,7 +8,7 @@ Read, search, send, move, and delete emails directly from your pi session. Crede
 
 ```bash
 # Install from npm (once published)
-pi install npm:pi-email-client
+pi install npm:@patimweb/pi-email
 
 # Install from local path during development
 pi install /path/to/pi-email-client
@@ -121,7 +121,7 @@ To publish this extension to the [pi package catalog](https://pi.dev/packages):
 2. Ensure `package.json` has a `"pi"` section declaring extensions
 3. Optionally add `"image"` or `"video"` preview URLs to the `"pi"` manifest
 4. Publish to npm: `npm publish`
-5. Users install with: `pi install npm:pi-email-client`
+5. Users install with: `pi install npm:@patimweb/pi-email`
 
 The package catalog auto-discovers packages with the `pi-package` keyword from npm.
 
