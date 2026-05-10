@@ -45,7 +45,6 @@
   "pi": {
     "extensions": [
       "./index.ts"
-    ],
-    "image": "https://raw.githubusercontent.com/Smotherer007/pi-email/main/screenshot.png"
+    ]
   }
 }
