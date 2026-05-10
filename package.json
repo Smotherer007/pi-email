@@ -31,6 +31,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@semantic-release/git": "^10.0.0",
     "semantic-release": "^25.0.0"
   },
   "pi": {
