@@ -1,6 +1,6 @@
 {
   "name": "@patimweb/pi-email",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "IMAP/SMTP email client extension for pi coding agent. Read, search, send, move, and delete emails from your inbox.",
   "keywords": [
     "pi-package",
