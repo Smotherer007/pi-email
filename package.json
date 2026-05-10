@@ -12,6 +12,13 @@
   "author": "Patrick Weppelmann",
   "license": "MIT",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Smotherer007/pi-email.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Smotherer007/pi-email/issues"
+  },
   "scripts": {
     "build": "echo 'No build step defined'"
   },
