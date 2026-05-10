@@ -12,6 +12,9 @@
   "author": "Patrick Weppelmann",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=20.12.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Smotherer007/pi-email.git"
