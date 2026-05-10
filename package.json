@@ -11,7 +11,7 @@
   ],
   "author": "Patrick Weppelmann",
   "license": "MIT",
-  "private": true,
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/Smotherer007/pi-email.git"
@@ -27,13 +27,11 @@
     "mailparser": "^3.7.2",
     "nodemailer": "^6.9.16"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
-    "semantic-release": "^24.0.0",
-    "@semantic-release/commit-analyzer": "^13.0.0",
-    "@semantic-release/release-notes-generator": "^14.0.0",
-    "@semantic-release/npm": "^12.0.0",
-    "@semantic-release/git": "^10.0.0",
-    "@semantic-release/github": "^11.0.0"
+    "semantic-release": "^25.0.0"
   },
   "pi": {
     "extensions": [
