@@ -93,18 +93,35 @@ export function fetchHeaders(
   mailbox: string,
   limit: number,
   unseen: boolean,
+  signal?: AbortSignal,
 ): Promise<{ headers: EmailHeader[]; total: number }> {
   return new Promise(async (resolve, reject) => {
     const imap = await connectImap(config);
+    const timeoutSignal = signal ?? AbortSignal.timeout(60_000);
+    let resolved = false;
+
+    if (timeoutSignal.aborted) {
+      imap.end();
+      return reject(new DOMException("IMAP operation timed out", "TimeoutError"));
+    }
+    timeoutSignal.addEventListener("abort", () => {
+      if (!resolved) {
+        resolved = true;
+        imap.end();
+        reject(new DOMException("IMAP operation timed out", "TimeoutError"));
+      }
+    }, { once: true });
 
     imap.openBox(mailbox, false, (err: Error, box: any) => {
       if (err) {
+        if (!resolved) resolved = true;
         imap.end();
         return reject(err);
       }
 
       const total = box.messages.total;
       if (total === 0) {
+        if (!resolved) resolved = true;
         imap.end();
         return resolve({ headers: [], total: 0 });
       }
@@ -112,11 +129,13 @@ export function fetchHeaders(
       const criteria: any[] = unseen ? [["UNSEEN"]] : [["ALL"]];
       imap.search(criteria, (err: Error, results: number[]) => {
         if (err) {
+          if (!resolved) resolved = true;
           imap.end();
           return reject(err);
         }
 
         if (results.length === 0) {
+          if (!resolved) resolved = true;
           imap.end();
           return resolve({ headers: [], total });
         }
@@ -167,13 +186,19 @@ export function fetchHeaders(
 
         fetch.once("error", (err: Error) => {
           imap.end();
-          reject(err);
+          if (!resolved) {
+            resolved = true;
+            reject(err);
+          }
         });
 
         fetch.once("end", () => {
           imap.end();
-          headers.sort((a, b) => b.uid - a.uid);
-          resolve({ headers, total });
+          if (!resolved) {
+            resolved = true;
+            headers.sort((a, b) => b.uid - a.uid);
+            resolve({ headers, total });
+          }
         });
       });
     });
@@ -187,21 +212,41 @@ export function readEmail(
   uid: number,
   mailbox: string,
   downloadDir: string | null,
+  signal?: AbortSignal,
 ): Promise<{ parsed: ParsedMail; savedFiles: string[] }> {
   const fs = require("node:fs");
   const path = require("node:path");
 
   return new Promise(async (resolve, reject) => {
     const imap = await connectImap(config);
+    const timeoutSignal = signal ?? AbortSignal.timeout(60_000);
+    let resolved = false;
+    const savedFiles: string[] = [];
+
+    if (timeoutSignal.aborted) {
+      imap.end();
+      return reject(new DOMException("IMAP operation timed out", "TimeoutError"));
+    }
+    timeoutSignal.addEventListener("abort", () => {
+      if (!resolved) {
+        resolved = true;
+        // Clean up any partially saved attachments
+        for (const f of savedFiles) {
+          try { fs.unlinkSync(f); } catch { /* ignore */ }
+        }
+        imap.end();
+        reject(new DOMException("IMAP operation timed out", "TimeoutError"));
+      }
+    }, { once: true });
 
     imap.openBox(mailbox, false, (err: Error) => {
       if (err) {
+        if (!resolved) resolved = true;
         imap.end();
         return reject(err);
       }
 
       const fetch = imap.fetch(uid, { bodies: "", struct: true });
-      let resolved = false;
 
       fetch.on("message", (msg: any) => {
         msg.on("body", (stream: any) => {
@@ -210,7 +255,6 @@ export function readEmail(
           stream.once("end", async () => {
             try {
               const parsed = await simpleParser(buffer);
-              const savedFiles: string[] = [];
 
               if (downloadDir && parsed.attachments?.length) {
                 if (!fs.existsSync(downloadDir)) {
@@ -224,8 +268,10 @@ export function readEmail(
                 }
               }
 
-              resolved = true;
-              resolve({ parsed, savedFiles });
+              if (!resolved) {
+                resolved = true;
+                resolve({ parsed, savedFiles });
+              }
             } catch (e) {
               if (!resolved) {
                 resolved = true;
@@ -258,12 +304,28 @@ export function searchEmails(
   mailbox: string,
   criteria: any[],
   limit: number,
+  signal?: AbortSignal,
 ): Promise<{ headers: EmailHeader[]; totalResults: number }> {
   return new Promise(async (resolve, reject) => {
     const imap = await connectImap(config);
+    const timeoutSignal = signal ?? AbortSignal.timeout(60_000);
+    let resolved = false;
+
+    if (timeoutSignal.aborted) {
+      imap.end();
+      return reject(new DOMException("IMAP operation timed out", "TimeoutError"));
+    }
+    timeoutSignal.addEventListener("abort", () => {
+      if (!resolved) {
+        resolved = true;
+        imap.end();
+        reject(new DOMException("IMAP operation timed out", "TimeoutError"));
+      }
+    }, { once: true });
 
     imap.openBox(mailbox, false, (err: Error) => {
       if (err) {
+        if (!resolved) resolved = true;
         imap.end();
         return reject(err);
       }
@@ -272,11 +334,13 @@ export function searchEmails(
 
       imap.search(searchCriteria, (err: Error, results: number[]) => {
         if (err) {
+          if (!resolved) resolved = true;
           imap.end();
           return reject(err);
         }
 
         if (results.length === 0) {
+          if (!resolved) resolved = true;
           imap.end();
           return resolve({ headers: [], totalResults: 0 });
         }
@@ -315,13 +379,19 @@ export function searchEmails(
 
         fetch.once("error", (err: Error) => {
           imap.end();
-          reject(err);
+          if (!resolved) {
+            resolved = true;
+            reject(err);
+          }
         });
 
         fetch.once("end", () => {
           imap.end();
-          headers.sort((a, b) => b.uid - a.uid);
-          resolve({ headers, totalResults: results.length });
+          if (!resolved) {
+            resolved = true;
+            headers.sort((a, b) => b.uid - a.uid);
+            resolve({ headers, totalResults: results.length });
+          }
         });
       });
     });

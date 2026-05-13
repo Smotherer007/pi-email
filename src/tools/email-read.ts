@@ -39,6 +39,7 @@ export const EmailReadTool = {
       params.uid,
       mailbox,
       params.downloadDir || null,
+      _signal,
     );
 
     const attachments: AttachmentInfo[] = (parsed.attachments || []).map(
@@ -52,7 +53,7 @@ export const EmailReadTool = {
     // Extract text from PDF attachments
     let pdfTexts: PdfContent[] = [];
     if (savedFiles.length > 0) {
-      pdfTexts = [...(await extractPdfsFromAttachments(savedFiles))];
+      pdfTexts = [...(await extractPdfsFromAttachments(savedFiles, _signal))];
     }
 
     const body: EmailBody = {

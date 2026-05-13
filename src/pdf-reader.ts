@@ -19,14 +19,10 @@ export interface PdfContent {
 /**
  * Check whether pdftotext is available on the system PATH.
  */
-export function pdftotextAvailable(): boolean {
+export async function pdftotextAvailable(): Promise<boolean> {
   try {
-    const result = require("node:child_process").spawnSync(
-      "pdftotext",
-      ["-v"],
-      { stdio: "ignore", timeout: 2000 },
-    );
-    return result.status === 0 || result.error === undefined;
+    await execFileAsync("pdftotext", ["-v"], { timeout: 2000 });
+    return true;
   } catch {
     return false;
   }
@@ -58,13 +54,18 @@ export async function extractPdfText(filePath: string): Promise<string> {
 /**
  * Extract text from all PDF files in a list of saved attachment paths.
  * Only processes files with .pdf extension.
+ * If the signal is aborted or the 120s timeout is reached, returns
+ * whatever results have been collected so far (graceful degradation).
  */
 export async function extractPdfsFromAttachments(
   savedFiles: ReadonlyArray<string>,
+  signal?: AbortSignal,
 ): Promise<ReadonlyArray<PdfContent>> {
+  const timeoutSignal = signal ?? AbortSignal.timeout(120_000);
   const results: PdfContent[] = [];
 
   for (const filePath of savedFiles) {
+    if (timeoutSignal.aborted) break;
     if (!filePath.toLowerCase().endsWith(".pdf")) continue;
     const text = await extractPdfText(filePath);
     const filename = filePath.split("/").pop() || filePath;

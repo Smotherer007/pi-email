@@ -54,6 +54,7 @@ export const EmailSearchTool = {
       mailbox,
       criteria,
       limit,
+      _signal,
     );
     const text = formatSearchResults(headers, totalResults);
 

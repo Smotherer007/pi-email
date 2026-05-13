@@ -21,8 +21,8 @@ afterAll(() => {
 });
 
 describe("pdftotextAvailable", () => {
-  it("returns boolean", () => {
-    const result = pdftotextAvailable();
+  it("returns boolean", async () => {
+    const result = await pdftotextAvailable();
     expect(typeof result).toBe("boolean");
   });
 });

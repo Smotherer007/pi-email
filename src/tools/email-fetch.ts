@@ -40,6 +40,7 @@ export const EmailFetchTool = {
       mailbox,
       limit,
       unseen,
+      _signal,
     );
     const text = formatHeaderList(headers, mailbox, total);
 
