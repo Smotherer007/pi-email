@@ -4,7 +4,7 @@
 
 import { Type } from "typebox";
 import { searchEmails } from "../clients/imap-client";
-import { getConfigOrThrow } from "../config";
+import { resolveConfig } from "../config";
 import { formatSearchResults } from "../formatting/formatters";
 import type { SearchParams } from "../types";
 
@@ -14,6 +14,9 @@ export const EmailSearchTool = {
   description:
     "Search emails using IMAP criteria. Specify one or more of: from, subject, body, since (YYYY-MM-DD), before (YYYY-MM-DD), unseen flag.",
   parameters: Type.Object({
+    profile: Type.Optional(
+      Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
+    ),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox name, defaults to INBOX" }),
     ),
@@ -37,7 +40,7 @@ export const EmailSearchTool = {
     params: SearchParams,
     _signal: AbortSignal,
   ) {
-    const config: EmailConfig = getConfigOrThrow();
+    const config = resolveConfig(params.profile);
     const mailbox = params.mailbox || "INBOX";
     const limit = params.limit || 20;
 

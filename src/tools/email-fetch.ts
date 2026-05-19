@@ -4,7 +4,7 @@
 
 import { Type } from "typebox";
 import { fetchHeaders } from "../clients/imap-client";
-import { getConfigOrThrow } from "../config";
+import { resolveConfig } from "../config";
 import { formatHeaderList } from "../formatting/formatters";
 import type { FetchParams } from "../types";
 
@@ -14,6 +14,9 @@ export const EmailFetchTool = {
   description:
     "Fetch a list of emails from a mailbox with optional limit. Returns headers (uid, from, subject, date, flags) for each email. Use email_read to get the full body.",
   parameters: Type.Object({
+    profile: Type.Optional(
+      Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
+    ),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox name, defaults to INBOX" }),
     ),
@@ -30,7 +33,7 @@ export const EmailFetchTool = {
     params: FetchParams,
     _signal: AbortSignal,
   ) {
-    const config: EmailConfig = getConfigOrThrow();
+    const config = resolveConfig(params.profile);
     const mailbox = params.mailbox || "INBOX";
     const limit = params.limit || 20;
     const unseen = params.unseen || false;

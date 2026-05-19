@@ -170,6 +170,33 @@ export function formatNotConfiguredStatus(): string {
   return "Email not configured. Use the email_setup tool to configure your account.";
 }
 
+export function formatProfileStatus(
+  profiles: Record<string, import("../types").EmailConfig>,
+  activeProfile: string | null,
+): string {
+  const names = Object.keys(profiles);
+
+  if (names.length === 0) {
+    return "Email not configured. Use the email_setup tool to configure an account.";
+  }
+
+  const lines: string[] = [
+    `${names.length} email profile${names.length === 1 ? "" : "s"} configured:`,
+    "",
+  ];
+
+  for (const name of names) {
+    const cfg = profiles[name];
+    const marker = name === activeProfile ? "[active]" : "       ";
+    const fromStr = cfg.fromName ? ` ("${cfg.fromName}")` : "";
+    lines.push(`${marker} ${name}: ${cfg.imap.user}${fromStr}`);
+    lines.push(`       IMAP: ${cfg.imap.host}:${cfg.imap.port} (TLS: ${cfg.imap.tls})`);
+    lines.push(`       SMTP: ${cfg.smtp.host}:${cfg.smtp.port} (Secure: ${cfg.smtp.secure})`);
+  }
+
+  return lines.join("\n");
+}
+
 export function formatConfiguredStatus(
   imapHost: string,
   imapPort: number,

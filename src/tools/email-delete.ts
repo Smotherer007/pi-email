@@ -4,7 +4,7 @@
 
 import { Type } from "typebox";
 import { deleteEmail } from "../clients/imap-client";
-import { getConfigOrThrow } from "../config";
+import { resolveConfig } from "../config";
 import type { DeleteParams } from "../types";
 
 export const EmailDeleteTool = {
@@ -13,6 +13,9 @@ export const EmailDeleteTool = {
   description:
     "Delete an email by UID. Marks as deleted and expunges immediately.",
   parameters: Type.Object({
+    profile: Type.Optional(
+      Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
+    ),
     uid: Type.Number({ description: "Email UID to delete" }),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox name, defaults to INBOX" }),
@@ -24,7 +27,7 @@ export const EmailDeleteTool = {
     params: DeleteParams,
     _signal: AbortSignal,
   ) {
-    const config: EmailConfig = getConfigOrThrow();
+    const config = resolveConfig(params.profile);
     const mailbox = params.mailbox || "INBOX";
 
     await deleteEmail(config, params.uid, mailbox);

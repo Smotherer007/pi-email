@@ -29,6 +29,11 @@ export interface EmailConfig {
   readonly fromName?: string;
 }
 
+export interface EmailProfiles {
+  readonly profiles: Record<string, EmailConfig>;
+  readonly activeProfile: string | null;
+}
+
 // ── Domain ──────────────────────────────────────────────────────────────────
 
 export interface EmailHeader {
@@ -89,6 +94,7 @@ export class EmailNotConfiguredError extends Error {
 // ── Tool parameter types (for documentation symmetry with TypeBox schemas) ──
 
 export interface SetupParams {
+  name: string;
   imapHost: string;
   imapPort: number;
   imapTls: boolean;
@@ -103,18 +109,21 @@ export interface SetupParams {
 }
 
 export interface FetchParams {
+  profile?: string;
   mailbox?: string;
   limit?: number;
   unseen?: boolean;
 }
 
 export interface ReadParams {
+  profile?: string;
   uid: number;
   mailbox?: string;
   downloadDir?: string;
 }
 
 export interface SearchParams {
+  profile?: string;
   mailbox?: string;
   from?: string;
   subject?: string;
@@ -126,6 +135,7 @@ export interface SearchParams {
 }
 
 export interface SendParams {
+  profile?: string;
   to: string;
   subject: string;
   body: string;
@@ -135,11 +145,13 @@ export interface SendParams {
 }
 
 export interface DeleteParams {
+  profile?: string;
   uid: number;
   mailbox?: string;
 }
 
 export interface MoveParams {
+  profile?: string;
   uid: number;
   destination: string;
   source?: string;

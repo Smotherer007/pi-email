@@ -3,4 +3,5 @@ coverage/
 *.pdf
 *.png
 *.jpg
+.DS_Store
 alternate_rechnung/

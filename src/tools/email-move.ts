@@ -4,7 +4,7 @@
 
 import { Type } from "typebox";
 import { moveEmail } from "../clients/imap-client";
-import { getConfigOrThrow } from "../config";
+import { resolveConfig } from "../config";
 import type { MoveParams } from "../types";
 
 export const EmailMoveTool = {
@@ -12,6 +12,9 @@ export const EmailMoveTool = {
   label: "Move Email",
   description: "Move an email to another mailbox/folder.",
   parameters: Type.Object({
+    profile: Type.Optional(
+      Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
+    ),
     uid: Type.Number({ description: "Email UID to move" }),
     destination: Type.String({ description: "Destination mailbox name" }),
     source: Type.Optional(
@@ -24,7 +27,7 @@ export const EmailMoveTool = {
     params: MoveParams,
     _signal: AbortSignal,
   ) {
-    const config: EmailConfig = getConfigOrThrow();
+    const config = resolveConfig(params.profile);
     const source = params.source || "INBOX";
 
     await moveEmail(config, params.uid, source, params.destination);

@@ -4,7 +4,7 @@
 
 import { Type } from "typebox";
 import { sendEmail } from "../clients/smtp-client";
-import { getConfigOrThrow } from "../config";
+import { resolveConfig } from "../config";
 import { formatSendResult } from "../formatting/formatters";
 import type { SendParams } from "../types";
 
@@ -14,6 +14,9 @@ export const EmailSendTool = {
   description:
     "Send an email via SMTP. Supports plain text, HTML, CC, BCC, and attachments.",
   parameters: Type.Object({
+    profile: Type.Optional(
+      Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
+    ),
     to: Type.String({
       description: "Recipient email address(es), comma-separated",
     }),
@@ -33,7 +36,7 @@ export const EmailSendTool = {
     params: SendParams,
     _signal: AbortSignal,
   ) {
-    const config: EmailConfig = getConfigOrThrow();
+    const config = resolveConfig(params.profile);
     const result = await sendEmail(config, params);
     const text = formatSendResult(result);
 

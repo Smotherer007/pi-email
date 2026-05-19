@@ -1,9 +1,12 @@
 /**
  * email_setup tool -- Configure email account credentials.
+ *
+ * Stores a named profile. A profile is automatically set as active
+ * if it's the first one. Use email_status to see all profiles.
  */
 
 import { Type } from "typebox";
-import { saveConfig } from "../config";
+import { saveProfile } from "../config";
 import type { EmailConfig, SetupParams } from "../types";
 
 export const EmailSetupTool = {
@@ -12,6 +15,9 @@ export const EmailSetupTool = {
   description:
     "Configure your email account credentials (IMAP/SMTP). Call this first before using any other email tools. After setup, credentials are stored in ~/.pi/email-config.json.",
   parameters: Type.Object({
+    name: Type.String({
+      description: "Profile name, e.g. 'work', 'personal', 'gmail'. Use a short, memorable name.",
+    }),
     imapHost: Type.String({
       description: "IMAP server hostname, e.g. imap.gmail.com",
     }),
@@ -70,16 +76,16 @@ export const EmailSetupTool = {
       fromName: params.fromName,
     };
 
-    saveConfig(config);
+    saveProfile(params.name, config);
 
     return {
       content: [
         {
           type: "text" as const,
-          text: "Email configuration saved. You can now use all email tools.",
+          text: `Email profile "${params.name}" saved and set as active. You can now use all email tools.`,
         },
       ],
-      details: { configSaved: true },
+      details: { profileName: params.name, configSaved: true },
     };
   },
 };

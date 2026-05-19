@@ -4,10 +4,10 @@
 
 import { Type } from "typebox";
 import { readEmail } from "../clients/imap-client";
-import { getConfigOrThrow } from "../config";
+import { resolveConfig } from "../config";
 import { formatEmailBody } from "../formatting/formatters";
 import { extractPdfsFromAttachments } from "../pdf-reader";
-import type { AttachmentInfo, EmailBody, EmailConfig, PdfContent, ReadParams } from "../types";
+import type { AttachmentInfo, EmailBody, PdfContent, ReadParams } from "../types";
 
 export const EmailReadTool = {
   name: "email_read",
@@ -15,6 +15,9 @@ export const EmailReadTool = {
   description:
     "Read the full body of a specific email by UID. Returns subject, from, date, and the full text body. Use downloadDir to save attachments. PDF attachments are automatically extracted and their text content included.",
   parameters: Type.Object({
+    profile: Type.Optional(
+      Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
+    ),
     uid: Type.Number({ description: "Email UID from email_fetch" }),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox name, defaults to INBOX" }),
@@ -31,7 +34,7 @@ export const EmailReadTool = {
     params: ReadParams,
     _signal: AbortSignal,
   ) {
-    const config: EmailConfig = getConfigOrThrow();
+    const config = resolveConfig(params.profile);
     const mailbox = params.mailbox || "INBOX";
 
     const { parsed, savedFiles } = await readEmail(
