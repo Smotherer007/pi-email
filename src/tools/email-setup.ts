@@ -52,6 +52,11 @@ export const EmailSetupTool = {
     smtpPassword: Type.String({
       description: "SMTP password or app-specific password",
     }),
+    smtpRejectUnauthorized: {
+      type: 'boolean',
+      description: 'Whether to validate the SMTP server TLS certificate. Set to false for ProtonMail Bridge.',
+      optional: true
+    },
     fromName: Type.Optional(
       Type.String({ description: "Display name for outgoing emails" }),
     ),
@@ -72,6 +77,9 @@ export const EmailSetupTool = {
         secure: params.smtpSecure,
         user: params.smtpUser,
         password: params.smtpPassword,
+        ...(params.smtpRejectUnauthorized !== undefined && {
+          tls: { rejectUnauthorized: params.smtpRejectUnauthorized }
+        })
       },
       fromName: params.fromName,
     };

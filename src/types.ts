@@ -21,6 +21,9 @@ export interface SmtpConfig {
   readonly secure: boolean;
   readonly user: string;
   readonly password: string;
+  readonly tls?: {
+    rejectUnauthorized: boolean;
+  };
 }
 
 export interface EmailConfig {
@@ -105,6 +108,7 @@ export interface SetupParams {
   smtpSecure: boolean;
   smtpUser: string;
   smtpPassword: string;
+  smtpRejectUnauthorized?: boolean;
   fromName?: string;
 }
 
