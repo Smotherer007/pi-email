@@ -12,7 +12,7 @@ export const EmailSendTool = {
   name: "email_send",
   label: "Send Email",
   description:
-    "Send an email via SMTP. Supports plain text, HTML, CC, BCC, and attachments.",
+    "Send an email via SMTP. Supports plain text, HTML, CC, BCC, and local file attachments.",
   parameters: Type.Object({
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
@@ -28,6 +28,14 @@ export const EmailSendTool = {
       Type.String({
         description: "HTML body (optional, overrides plain text display)",
       }),
+    ),
+    attachmentPaths: Type.Optional(
+      Type.Array(
+        Type.String({
+          description:
+            "Local filesystem path to attach. Absolute paths recommended; URLs/data URIs are not supported.",
+        }),
+      ),
     ),
   }),
 

@@ -8,6 +8,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import * as fs from "node:fs";
+import * as path from "node:path";
 
 const execFileAsync = promisify(execFile);
 
@@ -68,7 +69,7 @@ export async function extractPdfsFromAttachments(
     if (timeoutSignal.aborted) break;
     if (!filePath.toLowerCase().endsWith(".pdf")) continue;
     const text = await extractPdfText(filePath);
-    const filename = filePath.split("/").pop() || filePath;
+    const filename = path.basename(filePath);
     results.push({ filename, text });
   }
 
