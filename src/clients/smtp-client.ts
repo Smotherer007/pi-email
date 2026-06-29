@@ -12,6 +12,15 @@ export async function sendEmail(
   config: EmailConfig,
   params: SendParams,
 ): Promise<SendResult> {
+  for (const attachmentPath of params.attachmentPaths || []) {
+    const isUrlOrDataUri =
+      /^[a-z][a-z0-9+.-]*:\/\//i.test(attachmentPath) ||
+      /^data:/i.test(attachmentPath);
+    if (isUrlOrDataUri) {
+      throw new Error(`Only local attachment paths are supported: ${attachmentPath}`);
+    }
+  }
+
   const transporter = nodemailer.createTransport({
     host: config.smtp.host,
     port: config.smtp.port,
@@ -30,11 +39,15 @@ export async function sendEmail(
     to: params.to,
     subject: params.subject,
     text: params.body,
+    disableUrlAccess: true,
   };
 
   if (params.cc) mailOptions.cc = params.cc;
   if (params.bcc) mailOptions.bcc = params.bcc;
   if (params.html) mailOptions.html = params.html;
+  if (params.attachmentPaths?.length) {
+    mailOptions.attachments = params.attachmentPaths.map((path) => ({ path }));
+  }
 
   const info = await transporter.sendMail(mailOptions);
 

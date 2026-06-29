@@ -146,6 +146,7 @@ export interface SendParams {
   cc?: string;
   bcc?: string;
   html?: string;
+  attachmentPaths?: ReadonlyArray<string>;
 }
 
 export interface DeleteParams {

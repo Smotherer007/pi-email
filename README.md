@@ -66,9 +66,22 @@ Use the email_setup tool to configure a an email account with the following deta
 | `email_fetch` | Fetch email headers from a mailbox (from, subject, date, flags). |
 | `email_read` | Read the full body of a specific email by UID. Can save attachments. |
 | `email_search` | Search emails with IMAP criteria (from, subject, body, date range, unseen). |
-| `email_send` | Send an email via SMTP (plain text, HTML, CC, BCC). |
+| `email_send` | Send an email via SMTP (plain text, HTML, CC, BCC, local file attachments). |
 | `email_delete` | Delete an email by UID. |
 | `email_move` | Move an email to another mailbox. |
+
+### Sending attachments
+
+`email_send` accepts `attachmentPaths`, an array of local filesystem paths. Absolute paths are safest. URLs and data URIs are not supported.
+
+```yaml
+email_send:
+  to: recipient@example.com
+  subject: Report
+  body: Attached.
+  attachmentPaths:
+    - /path/to/report.pdf
+```
 
 ## Commands
 
