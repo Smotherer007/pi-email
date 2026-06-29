@@ -38,6 +38,24 @@ email_setup:
   fromName: Your Name
 ```
 
+For the ProtonMail Bridge, which runs locally on your machine, you can use the following prompt:
+```
+Use the email_setup tool to configure a an email account with the following details:
+ - name: "YOUR_PROFILE_NAME"                                                                                                                             
+ - fromName: "YOUR_NAME"                                                                                                                     
+ - imapUser: "YOUR_EMAIL"                                                                                                            
+ - imapPassword: "YOUR_PASSWORD"                                                                                    
+ - imapHost: "127.0.0.1"                                                                                                               
+ - imapPort: 1143                                                                                                                           
+ - imapTls: false                                                                                                                          
+ - smtpUser: "YOUR_EMAIL"                                                                                                            
+ - smtpPassword: "YOUR_PASSWORD"                                                                                    
+ - smtpHost: "127.0.0.1"                                                                                                               
+ - smtpPort: 1025                                                                                                                    
+ - smtpSecure: false                                                                                                                         
+ - smtpRejectUnauthorized: false
+```     
+
 ## Tools
 
 | Tool | Description |

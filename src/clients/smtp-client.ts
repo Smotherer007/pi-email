@@ -20,6 +20,7 @@ export async function sendEmail(
       user: config.smtp.user,
       pass: config.smtp.password,
     },
+    tls: config.smtp.tls
   });
 
   const fromName = config.fromName || config.smtp.user;
