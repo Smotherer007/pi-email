@@ -20,6 +20,9 @@ pi install /path/to/pi-email-client
 2. Fetch recent inbox emails with `email_fetch`
 3. Read full email bodies with `email_read`
 4. Send emails with `email_send`
+5. Reply to emails with `email_reply` (auto-threading)
+6. Forward emails with `email_forward`
+7. Mark emails as read/unread/flagged with `email_flag`
 
 Example configuration for Gmail (requires an [app-specific password](https://support.google.com/accounts/answer/185833)):
 
@@ -73,6 +76,49 @@ Use the email_setup tool to configure a an email account with the following deta
 | `email_delete` | Delete an email by UID. |
 | `email_move` | Move an email to another mailbox. |
 
+### Replying to emails
+
+`email_reply` answers an email by UID and automatically sets threading headers so your reply appears in the correct conversation thread. By default, it quotes the original message.
+
+```yaml
+email_reply:
+  uid: 42
+  body: "Thanks, got it!"
+  # quoteOriginal: false   # disable quoting
+  # replyAll: true          # include all original recipients
+```
+
+### Forwarding emails
+
+`email_forward` sends a copy of an email to new recipients with forwarding headers inline in the body. Original attachment names are listed. To re-attach files, first use `email_read` with `downloadDir`, then `email_send` with `attachmentPaths`.
+
+```yaml
+email_forward:
+  uid: 42
+  to: colleague@example.com
+  body: "FYI, see below."
+  # cc: manager@example.com
+```
+
+### Managing flags
+
+`email_flag` sets or removes IMAP flags on an email. Supports friendly aliases like `read`, `starred`, `replied`.
+
+```yaml
+# Mark as read
+email_flag:
+  uid: 42
+  add: ["Seen"]
+
+# Mark as unread and starred
+email_flag:
+  uid: 42
+  add: ["Flagged"]
+  remove: ["Seen"]
+```
+
+Supported flag aliases: `Seen` / `read` / `unread`, `Flagged` / `starred`, `Answered` / `replied`, `Draft`, `Deleted`.
+
 ### Sending attachments
 
 `email_send` accepts `attachmentPaths`, an array of local filesystem paths. Absolute paths are safest. URLs and data URIs are not supported.
@@ -125,8 +171,20 @@ The extension follows data-oriented programming principles:
 - **`src/clients/imap-client.ts`** -- IMAP operations. Each function opens a connection, performs work, and closes. Returns plain data.
 - **`src/clients/smtp-client.ts`** -- SMTP send operations via nodemailer.
 - **`src/formatting/formatters.ts`** -- Pure transformation functions that convert domain data into display strings. No side effects.
-- **`src/tools/*.ts`** -- Individual pi tool definitions. Each tool is a single-responsibility module that wires clients and formatters together.
-- **`index.ts`** -- Extension entry point. Loads config, registers tools, and registers commands.
+- **`src/tools/email-setup.ts`** -- Account configuration (IMAP/SMTP credentials).
+- **`src/tools/email-status.ts`** -- Show configured profiles.
+- **`src/tools/email-list-mailboxes.ts`** -- List IMAP folders.
+- **`src/tools/email-fetch.ts`** -- Fetch email headers.
+- **`src/tools/email-read.ts`** -- Read full email body with PDF extraction.
+- **`src/tools/email-search.ts`** -- Search emails with IMAP criteria.
+- **`src/tools/email-send.ts`** -- Send emails via SMTP.
+- **`src/tools/email-reply.ts`** -- Reply with threading headers and quoting.
+- **`src/tools/email-forward.ts`** -- Forward emails inline.
+- **`src/tools/email-flag.ts`** -- Set/remove IMAP flags.
+- **`src/tools/email-delete.ts`** -- Delete emails.
+- **`src/tools/email-move.ts`** -- Move emails between folders.
+- **`src/pdf-reader.ts`** -- PDF text extraction via pdftotext.
+- **`index.ts`** -- Extension entry point. Loads config, registers all 12 tools, and registers the `/inbox` command.
 
 ## Requirements
 
