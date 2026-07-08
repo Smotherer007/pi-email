@@ -14,12 +14,12 @@
 import type { EmailConfig, EmailProfiles } from "./types";
 import { EmailNotConfiguredError } from "./types";
 
-// ── Mutable state ───────────────────────────────────────────────────────────
+// Mutable state
 
 let profiles: Record<string, EmailConfig> = {};
 let activeProfile: string | null = null;
 
-// ── Path resolution ─────────────────────────────────────────────────────────
+// Path resolution
 
 function configPath(): string {
   const path = require("node:path");
@@ -27,7 +27,7 @@ function configPath(): string {
   return path.join(home, ".pi", "email-config.json");
 }
 
-// ── Persistence ─────────────────────────────────────────────────────────────
+// Persistence
 
 function persistProfiles(): void {
   const fs = require("node:fs");
@@ -78,7 +78,7 @@ export function loadConfig(): void {
   }
 }
 
-// ── Access ──────────────────────────────────────────────────────────────────
+// Access
 
 export function getConfig(): EmailConfig | null {
   if (!activeProfile) return null;
@@ -123,7 +123,7 @@ export function getActiveProfile(): string | null {
   return activeProfile;
 }
 
-// ── Mutations ───────────────────────────────────────────────────────────────
+// Mutations
 
 export function saveProfile(name: string, config: EmailConfig): void {
   profiles[name] = config;

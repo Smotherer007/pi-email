@@ -4,15 +4,18 @@
  * Provides email capabilities via IMAP (read) and SMTP (send).
  *
  * Tools:
+ *   - email_setup: Configure email account credentials
+ *   - email_status: Show connection status and config
  *   - email_list_mailboxes: List available IMAP folders
  *   - email_fetch: Fetch emails from a mailbox
  *   - email_read: Read a specific email by UID
  *   - email_search: Search emails with IMAP criteria
  *   - email_send: Send an email via SMTP
+ *   - email_reply: Reply to an email with threading headers
+ *   - email_forward: Forward an email to new recipients
  *   - email_delete: Delete an email
  *   - email_move: Move an email to another mailbox
- *   - email_status: Show connection status and config
- *   - email_setup: Configure email account credentials
+ *   - email_flag: Set or remove IMAP flags (read/unread/flagged)
  *
  * Data-oriented design:
  *   - All domain data is represented as plain immutable interfaces (types.ts)
@@ -31,8 +34,11 @@ import { EmailFetchTool } from "./src/tools/email-fetch";
 import { EmailReadTool } from "./src/tools/email-read";
 import { EmailSearchTool } from "./src/tools/email-search";
 import { EmailSendTool } from "./src/tools/email-send";
+import { EmailReplyTool } from "./src/tools/email-reply";
+import { EmailForwardTool } from "./src/tools/email-forward";
 import { EmailDeleteTool } from "./src/tools/email-delete";
 import { EmailMoveTool } from "./src/tools/email-move";
+import { EmailFlagTool } from "./src/tools/email-flag";
 import { EmailStatusTool } from "./src/tools/email-status";
 
 export default function (pi: ExtensionAPI) {
@@ -47,8 +53,11 @@ export default function (pi: ExtensionAPI) {
   pi.registerTool(EmailReadTool);
   pi.registerTool(EmailSearchTool);
   pi.registerTool(EmailSendTool);
+  pi.registerTool(EmailReplyTool);
+  pi.registerTool(EmailForwardTool);
   pi.registerTool(EmailDeleteTool);
   pi.registerTool(EmailMoveTool);
+  pi.registerTool(EmailFlagTool);
 
   // Register a shortcut to quickly check inbox
   pi.registerCommand("inbox", {

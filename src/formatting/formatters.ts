@@ -7,7 +7,7 @@
 
 import type { EmailBody, EmailHeader, MailboxInfo, SendResult } from "../types";
 
-// ── Mailbox list ────────────────────────────────────────────────────────────
+// Mailbox list
 
 export function formatMailboxList(mailboxes: ReadonlyArray<MailboxInfo>): string {
   if (mailboxes.length === 0) {
@@ -30,7 +30,7 @@ export function formatMailboxList(mailboxes: ReadonlyArray<MailboxInfo>): string
   return "Available mailboxes:\n" + lines.join("\n");
 }
 
-// ── Email headers list ──────────────────────────────────────────────────────
+// Email headers list
 
 export function formatHeaderList(
   headers: ReadonlyArray<EmailHeader>,
@@ -61,7 +61,7 @@ export function formatHeaderList(
   return lines.join("\n");
 }
 
-// ── Single email body ───────────────────────────────────────────────────────
+// Single email body
 
 export function formatEmailBody(
   email: EmailBody,
@@ -124,7 +124,7 @@ export function formatEmailBody(
   return parts.join("\n");
 }
 
-// ── Search results ──────────────────────────────────────────────────────────
+// Search results
 
 export function formatSearchResults(
   headers: ReadonlyArray<EmailHeader>,
@@ -153,7 +153,7 @@ export function formatSearchResults(
   return lines.join("\n");
 }
 
-// ── Send result ─────────────────────────────────────────────────────────────
+// Send result
 
 export function formatSendResult(result: SendResult): string {
   return [
@@ -164,7 +164,7 @@ export function formatSendResult(result: SendResult): string {
   ].join("\n");
 }
 
-// ── Status ──────────────────────────────────────────────────────────────────
+// Status
 
 export function formatNotConfiguredStatus(): string {
   return "Email not configured. Use the email_setup tool to configure your account.";

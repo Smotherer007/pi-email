@@ -10,7 +10,7 @@ import type { ParsedMail } from "mailparser";
 import { simpleParser } from "mailparser";
 import type { EmailConfig, EmailHeader, MailboxInfo } from "../types";
 
-// ── Connection ──────────────────────────────────────────────────────────────
+// Connection
 
 export function connectImap(config: EmailConfig): Promise<Imap> {
   return new Promise((resolve, reject) => {
@@ -31,7 +31,7 @@ export function connectImap(config: EmailConfig): Promise<Imap> {
   });
 }
 
-// ── RFC 2047 header decoding ────────────────────────────────────────────────
+// RFC 2047 header decoding
 
 export function decodeHeader(value: string | undefined | null): string {
   if (!value) return "";
@@ -59,7 +59,7 @@ export function decodeHeader(value: string | undefined | null): string {
   }
 }
 
-// ── Mailbox listing ─────────────────────────────────────────────────────────
+// Mailbox listing
 
 export function listMailboxes(config: EmailConfig): Promise<ReadonlyArray<MailboxInfo>> {
   return new Promise(async (resolve, reject) => {
@@ -86,7 +86,7 @@ export function listMailboxes(config: EmailConfig): Promise<ReadonlyArray<Mailbo
   });
 }
 
-// ── Fetch headers ───────────────────────────────────────────────────────────
+// Fetch headers
 
 export function fetchHeaders(
   config: EmailConfig,
@@ -205,7 +205,7 @@ export function fetchHeaders(
   });
 }
 
-// ── Read full email ─────────────────────────────────────────────────────────
+// Read full email
 
 export function readEmail(
   config: EmailConfig,
@@ -297,7 +297,7 @@ export function readEmail(
   });
 }
 
-// ── Search ──────────────────────────────────────────────────────────────────
+// Search
 
 export function searchEmails(
   config: EmailConfig,
@@ -398,7 +398,7 @@ export function searchEmails(
   });
 }
 
-// ── Delete ──────────────────────────────────────────────────────────────────
+// Delete
 
 export function deleteEmail(
   config: EmailConfig,
@@ -429,7 +429,7 @@ export function deleteEmail(
   });
 }
 
-// ── Move ────────────────────────────────────────────────────────────────────
+// Move
 
 export function moveEmail(
   config: EmailConfig,

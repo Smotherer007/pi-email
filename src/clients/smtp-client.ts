@@ -8,9 +8,14 @@
 import nodemailer from "nodemailer";
 import type { EmailConfig, SendParams, SendResult } from "../types";
 
+export interface SendOptions extends SendParams {
+  /** Custom headers like In-Reply-To, References for threading */
+  customHeaders?: Record<string, string>;
+}
+
 export async function sendEmail(
   config: EmailConfig,
-  params: SendParams,
+  params: SendParams | SendOptions,
 ): Promise<SendResult> {
   for (const attachmentPath of params.attachmentPaths || []) {
     const isUrlOrDataUri =
@@ -47,6 +52,14 @@ export async function sendEmail(
   if (params.html) mailOptions.html = params.html;
   if (params.attachmentPaths?.length) {
     mailOptions.attachments = params.attachmentPaths.map((path) => ({ path }));
+  }
+
+  // Apply custom headers (e.g. In-Reply-To, References)
+  const opts = params as SendOptions;
+  if (opts.customHeaders) {
+    for (const [key, value] of Object.entries(opts.customHeaders)) {
+      mailOptions[key] = value;
+    }
   }
 
   const info = await transporter.sendMail(mailOptions);

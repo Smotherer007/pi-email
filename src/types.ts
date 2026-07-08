@@ -5,7 +5,7 @@
  * No behavior, no classes, no inheritance -- just data.
  */
 
-// ── Configuration ───────────────────────────────────────────────────────────
+// Configuration
 
 export interface ImapConfig {
   readonly host: string;
@@ -37,7 +37,7 @@ export interface EmailProfiles {
   readonly activeProfile: string | null;
 }
 
-// ── Domain ──────────────────────────────────────────────────────────────────
+// Domain
 
 export interface EmailHeader {
   readonly uid: number;
@@ -85,7 +85,7 @@ export interface MailboxInfo {
   readonly children: ReadonlyArray<MailboxInfo>;
 }
 
-// ── Operation errors ────────────────────────────────────────────────────────
+// Operation errors
 
 export class EmailNotConfiguredError extends Error {
   constructor() {
@@ -94,7 +94,7 @@ export class EmailNotConfiguredError extends Error {
   }
 }
 
-// ── Tool parameter types (for documentation symmetry with TypeBox schemas) ──
+// Tool parameter types
 
 export interface SetupParams {
   name: string;

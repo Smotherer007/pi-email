@@ -15,7 +15,7 @@ import type {
   SendResult,
 } from "../src/types";
 
-// ── formatMailboxList ───────────────────────────────────────────────────────
+// formatMailboxList
 
 describe("formatMailboxList", () => {
   it("returns 'no mailboxes' for empty list", () => {
@@ -79,7 +79,7 @@ describe("formatMailboxList", () => {
   });
 });
 
-// ── formatHeaderList ────────────────────────────────────────────────────────
+// formatHeaderList
 
 describe("formatHeaderList", () => {
   it("returns empty message for no headers", () => {
@@ -212,7 +212,7 @@ describe("formatHeaderList", () => {
   });
 });
 
-// ── formatEmailBody ─────────────────────────────────────────────────────────
+// formatEmailBody
 
 describe("formatEmailBody", () => {
   const baseEmail: EmailBody = {
@@ -355,7 +355,7 @@ describe("formatEmailBody", () => {
   });
 });
 
-// ── formatSearchResults ─────────────────────────────────────────────────────
+// formatSearchResults
 
 describe("formatSearchResults", () => {
   it("shows no results message for empty list", () => {
@@ -418,7 +418,7 @@ describe("formatSearchResults", () => {
   });
 });
 
-// ── formatSendResult ────────────────────────────────────────────────────────
+// formatSendResult
 
 describe("formatSendResult", () => {
   it("shows success message with details", () => {
@@ -435,7 +435,7 @@ describe("formatSendResult", () => {
   });
 });
 
-// ── formatNotConfiguredStatus ────────────────────────────────────────────────
+// formatNotConfiguredStatus
 
 describe("formatNotConfiguredStatus", () => {
   it("returns unconfigured message", () => {
@@ -445,7 +445,7 @@ describe("formatNotConfiguredStatus", () => {
   });
 });
 
-// ── formatConfiguredStatus ──────────────────────────────────────────────────
+// formatConfiguredStatus
 
 describe("formatConfiguredStatus", () => {
   it("shows IMAP and SMTP config", () => {

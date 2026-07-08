@@ -67,6 +67,9 @@ Use the email_setup tool to configure a an email account with the following deta
 | `email_read` | Read the full body of a specific email by UID. Can save attachments. |
 | `email_search` | Search emails with IMAP criteria (from, subject, body, date range, unseen). |
 | `email_send` | Send an email via SMTP (plain text, HTML, CC, BCC, local file attachments). |
+| `email_reply` | Reply to an email. Auto-sets In-Reply-To/References headers for threading. Supports reply-all and quoting. |
+| `email_forward` | Forward an email to new recipients with inline forwarding headers. |
+| `email_flag` | Set or remove IMAP flags (Seen/Unseen, Flagged, Answered, etc.). |
 | `email_delete` | Delete an email by UID. |
 | `email_move` | Move an email to another mailbox. |
 
