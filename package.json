@@ -31,7 +31,7 @@
   "dependencies": {
     "imap": "^0.8.17",
     "mailparser": "^3.7.2",
-    "nodemailer": "^8.0.10",
+    "nodemailer": "^9.0.3",
     "typebox": "^1.2.8"
   },
   "publishConfig": {
