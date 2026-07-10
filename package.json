@@ -34,6 +34,11 @@
     "nodemailer": "^9.0.3",
     "typebox": "^1.2.8"
   },
+  "overrides": {
+    "utf7": {
+      "semver": "5.7.2"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
