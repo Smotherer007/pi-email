@@ -6,7 +6,7 @@
  */
 
 import nodemailer from "nodemailer";
-import type { EmailConfig, SendParams, SendResult } from "../types";
+import type { EmailConfig, SendParams, SendResult } from "../types.ts";
 
 export interface SendOptions extends SendParams {
   /** Custom headers like In-Reply-To, References for threading */

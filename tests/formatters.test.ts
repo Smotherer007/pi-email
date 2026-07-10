@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import {
   formatMailboxList,
   formatHeaderList,
@@ -7,28 +8,26 @@ import {
   formatSendResult,
   formatNotConfiguredStatus,
   formatConfiguredStatus,
-} from "../src/formatting/formatters";
+} from "../src/formatting/formatters.ts";
 import type {
   EmailBody,
   EmailHeader,
   MailboxInfo,
   SendResult,
-} from "../src/types";
+} from "../src/types.ts";
 
 // formatMailboxList
 
 describe("formatMailboxList", () => {
   it("returns 'no mailboxes' for empty list", () => {
-    expect(formatMailboxList([])).toBe("No mailboxes found.");
+    assert.strictEqual(formatMailboxList([]), "No mailboxes found.");
   });
 
   it("formats single selectable mailbox", () => {
     const boxes: MailboxInfo[] = [
       { name: "INBOX", selectable: true, children: [] },
     ];
-    expect(formatMailboxList(boxes)).toBe(
-      "Available mailboxes:\n[ ] INBOX",
-    );
+    assert.strictEqual(formatMailboxList(boxes), "Available mailboxes:\n[ ] INBOX");
   });
 
   it("marks non-selectable boxes with [>]", () => {
@@ -36,7 +35,7 @@ describe("formatMailboxList", () => {
       { name: "Archive", selectable: false, children: [] },
     ];
     const result = formatMailboxList(boxes);
-    expect(result).toContain("[>] Archive/");
+    assert.ok(result.includes("[>] Archive/"));
   });
 
   it("formats nested mailboxes with indentation", () => {
@@ -50,8 +49,8 @@ describe("formatMailboxList", () => {
       },
     ];
     const result = formatMailboxList(boxes);
-    expect(result).toContain("[ ] INBOX");
-    expect(result).toContain("  [ ] Subfolder");
+    assert.ok(result.includes("[ ] INBOX"));
+    assert.ok(result.includes("  [ ] Subfolder"));
   });
 
   it("formats deeply nested structure", () => {
@@ -72,10 +71,10 @@ describe("formatMailboxList", () => {
     ];
     const result = formatMailboxList(boxes);
     const lines = result.split("\n");
-    expect(lines[0]).toBe("Available mailboxes:");
-    expect(lines[1]).toBe("[>] A/");
-    expect(lines[2]).toBe("  [ ] B");
-    expect(lines[3]).toBe("    [ ] C");
+    assert.strictEqual(lines[0], "Available mailboxes:");
+    assert.strictEqual(lines[1], "[>] A/");
+    assert.strictEqual(lines[2], "  [ ] B");
+    assert.strictEqual(lines[3], "    [ ] C");
   });
 });
 
@@ -84,7 +83,7 @@ describe("formatMailboxList", () => {
 describe("formatHeaderList", () => {
   it("returns empty message for no headers", () => {
     const result = formatHeaderList([], "INBOX", 0);
-    expect(result).toBe('Mailbox "INBOX" is empty.');
+    assert.strictEqual(result, 'Mailbox "INBOX" is empty.');
   });
 
   it("shows correct count header", () => {
@@ -101,9 +100,7 @@ describe("formatHeaderList", () => {
       },
     ];
     const result = formatHeaderList(headers, "INBOX", 100);
-    expect(result).toContain(
-      'Mailbox "INBOX" -- showing 1 of 100 messages:',
-    );
+    assert.ok(result.includes('Mailbox "INBOX" -- showing 1 of 100 messages:'));
   });
 
   it("marks read emails with [read]", () => {
@@ -120,7 +117,7 @@ describe("formatHeaderList", () => {
       },
     ];
     const result = formatHeaderList(headers, "INBOX", 1);
-    expect(result).toContain("[read]");
+    assert.ok(result.includes("[read]"));
   });
 
   it("marks unread emails with [unread]", () => {
@@ -137,7 +134,7 @@ describe("formatHeaderList", () => {
       },
     ];
     const result = formatHeaderList(headers, "INBOX", 1);
-    expect(result).toContain("[unread]");
+    assert.ok(result.includes("[unread]"));
   });
 
   it("shows (no subject) for empty subject", () => {
@@ -154,7 +151,7 @@ describe("formatHeaderList", () => {
       },
     ];
     const result = formatHeaderList(headers, "INBOX", 1);
-    expect(result).toContain("(no subject)");
+    assert.ok(result.includes("(no subject)"));
   });
 
   it("truncates long subjects at 70 characters", () => {
@@ -172,8 +169,8 @@ describe("formatHeaderList", () => {
       },
     ];
     const result = formatHeaderList(headers, "INBOX", 1);
-    expect(result).toContain("A".repeat(70) + "...");
-    expect(result).not.toContain(longSubject);
+    assert.ok(result.includes("A".repeat(70) + "..."));
+    assert.ok(!result.includes(longSubject));
   });
 
   it("extracts name from From address", () => {
@@ -190,8 +187,8 @@ describe("formatHeaderList", () => {
       },
     ];
     const result = formatHeaderList(headers, "INBOX", 1);
-    expect(result).toContain("Display Name");
-    expect(result).not.toContain("<email@example.com>");
+    assert.ok(result.includes("Display Name"));
+    assert.ok(!result.includes("<email@example.com>"));
   });
 
   it("handles unknown date gracefully", () => {
@@ -208,7 +205,7 @@ describe("formatHeaderList", () => {
       },
     ];
     const result = formatHeaderList(headers, "INBOX", 1);
-    expect(result).toContain("unknown");
+    assert.ok(result.includes("unknown"));
   });
 });
 
@@ -228,22 +225,22 @@ describe("formatEmailBody", () => {
 
   it("shows UID, From, To, Date, Subject", () => {
     const result = formatEmailBody(baseEmail, []);
-    expect(result).toContain("Email UID: 42");
-    expect(result).toContain("From: Alice <alice@example.com>");
-    expect(result).toContain("To: Bob <bob@example.com>");
-    expect(result).toContain("Date: 2025-01-01T00:00:00.000Z");
-    expect(result).toContain("Subject: Hello World");
+    assert.ok(result.includes("Email UID: 42"));
+    assert.ok(result.includes("From: Alice <alice@example.com>"));
+    assert.ok(result.includes("To: Bob <bob@example.com>"));
+    assert.ok(result.includes("Date: 2025-01-01T00:00:00.000Z"));
+    assert.ok(result.includes("Subject: Hello World"));
   });
 
   it("shows CC when present", () => {
     const withCC = { ...baseEmail, cc: "Carol <carol@example.com>" };
     const result = formatEmailBody(withCC, []);
-    expect(result).toContain("CC: Carol <carol@example.com>");
+    assert.ok(result.includes("CC: Carol <carol@example.com>"));
   });
 
   it("does not show CC when empty", () => {
     const result = formatEmailBody(baseEmail, []);
-    expect(result).not.toContain("CC:");
+    assert.ok(!result.includes("CC:"));
   });
 
   it("shows attachments section when present", () => {
@@ -254,8 +251,8 @@ describe("formatEmailBody", () => {
       ],
     };
     const result = formatEmailBody(withAtt, []);
-    expect(result).toContain("Attachments:");
-    expect(result).toContain("[file] doc.pdf (application/pdf, 100KB)");
+    assert.ok(result.includes("Attachments:"));
+    assert.ok(result.includes("[file] doc.pdf (application/pdf, 100KB)"));
   });
 
   it("shows multiple attachments", () => {
@@ -267,8 +264,8 @@ describe("formatEmailBody", () => {
       ],
     };
     const result = formatEmailBody(withAtts, []);
-    expect(result).toContain("[file] a.pdf");
-    expect(result).toContain("[file] b.png");
+    assert.ok(result.includes("[file] a.pdf"));
+    assert.ok(result.includes("[file] b.png"));
   });
 
   it("shows saved files path section", () => {
@@ -276,24 +273,24 @@ describe("formatEmailBody", () => {
       "/tmp/doc.pdf",
       "/tmp/img.png",
     ]);
-    expect(result).toContain("Attachments saved to:");
-    expect(result).toContain("  /tmp/doc.pdf");
-    expect(result).toContain("  /tmp/img.png");
+    assert.ok(result.includes("Attachments saved to:"));
+    assert.ok(result.includes("  /tmp/doc.pdf"));
+    assert.ok(result.includes("  /tmp/img.png"));
   });
 
   it("truncates body at 8000 characters", () => {
     const longText = "x".repeat(10000);
     const longEmail = { ...baseEmail, text: longText };
     const result = formatEmailBody(longEmail, []);
-    expect(result).toContain("x".repeat(8000));
-    expect(result).toContain("[... email truncated ...]");
-    expect(result).not.toContain("x".repeat(8001));
+    assert.ok(result.includes("x".repeat(8000)));
+    assert.ok(result.includes("[... email truncated ...]"));
+    assert.ok(!result.includes("x".repeat(8001)));
   });
 
   it("handles empty body by showing empty text", () => {
     const emptyEmail = { ...baseEmail, text: "" };
     const result = formatEmailBody(emptyEmail, []);
-    expect(result).toContain("--- Body ---");
+    assert.ok(result.includes("--- Body ---"));
   });
 
   describe("PDF attachments", () => {
@@ -303,9 +300,9 @@ describe("formatEmailBody", () => {
         pdfTexts: [{ filename: "invoice.pdf", text: "Invoice #123\nTotal: 100 EUR" }],
       };
       const result = formatEmailBody(email, []);
-      expect(result).toContain("--- PDF: invoice.pdf ---");
-      expect(result).toContain("Invoice #123");
-      expect(result).toContain("Total: 100 EUR");
+      assert.ok(result.includes("--- PDF: invoice.pdf ---"));
+      assert.ok(result.includes("Invoice #123"));
+      assert.ok(result.includes("Total: 100 EUR"));
     });
 
     it("shows multiple PDFs in order", () => {
@@ -319,7 +316,7 @@ describe("formatEmailBody", () => {
       const result = formatEmailBody(email, []);
       const aPos = result.indexOf("--- PDF: a.pdf ---");
       const bPos = result.indexOf("--- PDF: b.pdf ---");
-      expect(aPos).toBeLessThan(bPos);
+      assert.ok(aPos < bPos);
     });
 
     it("shows (no text extracted) for empty PDF", () => {
@@ -328,7 +325,7 @@ describe("formatEmailBody", () => {
         pdfTexts: [{ filename: "empty.pdf", text: "" }],
       };
       const result = formatEmailBody(email, []);
-      expect(result).toContain("(no text extracted)");
+      assert.ok(result.includes("(no text extracted)"));
     });
 
     it("truncates PDF text at 5000 characters", () => {
@@ -338,19 +335,19 @@ describe("formatEmailBody", () => {
         pdfTexts: [{ filename: "big.pdf", text: pdfText }],
       };
       const result = formatEmailBody(email, []);
-      expect(result).toContain("y".repeat(5000));
-      expect(result).toContain("[... PDF truncated ...]");
+      assert.ok(result.includes("y".repeat(5000)));
+      assert.ok(result.includes("[... PDF truncated ...]"));
     });
 
     it("does not show PDF section when pdfTexts is undefined", () => {
       const result = formatEmailBody(baseEmail, []);
-      expect(result).not.toContain("--- PDF:");
+      assert.ok(!result.includes("--- PDF:"));
     });
 
     it("does not show PDF section when pdfTexts is empty array", () => {
       const email = { ...baseEmail, pdfTexts: [] };
       const result = formatEmailBody(email, []);
-      expect(result).not.toContain("--- PDF:");
+      assert.ok(!result.includes("--- PDF:"));
     });
   });
 });
@@ -359,7 +356,8 @@ describe("formatEmailBody", () => {
 
 describe("formatSearchResults", () => {
   it("shows no results message for empty list", () => {
-    expect(formatSearchResults([], 0)).toBe(
+    assert.strictEqual(
+      formatSearchResults([], 0),
       "No emails matching your search criteria.",
     );
   });
@@ -378,7 +376,7 @@ describe("formatSearchResults", () => {
       },
     ];
     const result = formatSearchResults(headers, 25);
-    expect(result).toContain("Search results (25 total, showing 1):");
+    assert.ok(result.includes("Search results (25 total, showing 1):"));
   });
 
   it("shows UID, from, subject, date for each result", () => {
@@ -395,9 +393,9 @@ describe("formatSearchResults", () => {
       },
     ];
     const result = formatSearchResults(headers, 1);
-    expect(result).toContain("[UID:99]");
-    expect(result).toContain("Alice");
-    expect(result).toContain('"Hello"');
+    assert.ok(result.includes("[UID:99]"));
+    assert.ok(result.includes("Alice"));
+    assert.ok(result.includes('"Hello"'));
   });
 
   it("shows (no subject) for empty subject in search", () => {
@@ -414,7 +412,7 @@ describe("formatSearchResults", () => {
       },
     ];
     const result = formatSearchResults(headers, 1);
-    expect(result).toContain("(no subject)");
+    assert.ok(result.includes("(no subject)"));
   });
 });
 
@@ -428,10 +426,10 @@ describe("formatSendResult", () => {
       subject: "Test email",
     };
     const text = formatSendResult(result);
-    expect(text).toContain("Email sent successfully.");
-    expect(text).toContain("Message-ID: <abc123@example.com>");
-    expect(text).toContain("To: bob@example.com");
-    expect(text).toContain("Subject: Test email");
+    assert.ok(text.includes("Email sent successfully."));
+    assert.ok(text.includes("Message-ID: <abc123@example.com>"));
+    assert.ok(text.includes("To: bob@example.com"));
+    assert.ok(text.includes("Subject: Test email"));
   });
 });
 
@@ -440,8 +438,8 @@ describe("formatSendResult", () => {
 describe("formatNotConfiguredStatus", () => {
   it("returns unconfigured message", () => {
     const result = formatNotConfiguredStatus();
-    expect(result).toContain("Email not configured");
-    expect(result).toContain("email_setup");
+    assert.ok(result.includes("Email not configured"));
+    assert.ok(result.includes("email_setup"));
   });
 });
 
@@ -459,9 +457,9 @@ describe("formatConfiguredStatus", () => {
       false,
       "user@example.com",
     );
-    expect(result).toContain("Email configured");
-    expect(result).toContain("IMAP: user@example.com@imap.example.com:993 (TLS: true)");
-    expect(result).toContain("SMTP: user@example.com@smtp.example.com:587 (Secure: false)");
+    assert.ok(result.includes("Email configured"));
+    assert.ok(result.includes("IMAP: user@example.com@imap.example.com:993 (TLS: true)"));
+    assert.ok(result.includes("SMTP: user@example.com@smtp.example.com:587 (Secure: false)"));
   });
 
   it("does not show from name line when missing", () => {
@@ -476,7 +474,7 @@ describe("formatConfiguredStatus", () => {
       "user@example.com",
       undefined,
     );
-    expect(result).not.toContain("From name:");
+    assert.ok(!result.includes("From name:"));
   });
 
   it("shows from name when provided", () => {
@@ -491,6 +489,6 @@ describe("formatConfiguredStatus", () => {
       "user@example.com",
       "John Doe",
     );
-    expect(result).toContain("From name: John Doe");
+    assert.ok(result.includes("From name: John Doe"));
   });
 });

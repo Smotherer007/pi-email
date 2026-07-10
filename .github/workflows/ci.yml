@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20, 22]
+        node-version: [24, 26]
 
     steps:
       - uses: actions/checkout@v6
@@ -28,15 +28,3 @@ jobs:
 
       - name: Run tests
         run: npm test
-
-      - name: Run tests with coverage
-        run: npx vitest run --coverage
-        continue-on-error: true
-
-      - name: Upload coverage to Codecov
-        if: matrix.node-version == 22
-        uses: codecov/codecov-action@v6
-        with:
-          files: ./coverage/lcov.info
-          fail_ci_if_error: false
-        continue-on-error: true

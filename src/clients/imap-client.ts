@@ -8,7 +8,9 @@
 import Imap from "imap";
 import type { ParsedMail } from "mailparser";
 import { simpleParser } from "mailparser";
-import type { EmailConfig, EmailHeader, MailboxInfo } from "../types";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import type { EmailConfig, EmailHeader, MailboxInfo } from "../types.ts";
 
 // Connection
 
@@ -214,9 +216,6 @@ export function readEmail(
   downloadDir: string | null,
   signal?: AbortSignal,
 ): Promise<{ parsed: ParsedMail; savedFiles: string[] }> {
-  const fs = require("node:fs");
-  const path = require("node:path");
-
   return new Promise(async (resolve, reject) => {
     const imap = await connectImap(config);
     const timeoutSignal = signal ?? AbortSignal.timeout(60_000);

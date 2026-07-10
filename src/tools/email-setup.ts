@@ -6,8 +6,8 @@
  */
 
 import { Type } from "typebox";
-import { saveProfile } from "../config";
-import type { EmailConfig, SetupParams } from "../types";
+import { saveProfile } from "../config.ts";
+import type { EmailConfig, SetupParams } from "../types.ts";
 
 export const EmailSetupTool = {
   name: "email_setup",

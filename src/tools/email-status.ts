@@ -5,8 +5,8 @@
  */
 
 import { Type } from "typebox";
-import { getProfiles, getActiveProfile } from "../config";
-import { formatProfileStatus } from "../formatting/formatters";
+import { getProfiles, getActiveProfile } from "../config.ts";
+import { formatProfileStatus } from "../formatting/formatters.ts";
 
 export const EmailStatusTool = {
   name: "email_status",

@@ -2,20 +2,21 @@
  * Smoke test — verifies all 12 tools have the correct shape
  * and that the extension entry point registers them without errors.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 
-import { EmailSetupTool } from "../src/tools/email-setup";
-import { EmailStatusTool } from "../src/tools/email-status";
-import { EmailListMailboxesTool } from "../src/tools/email-list-mailboxes";
-import { EmailFetchTool } from "../src/tools/email-fetch";
-import { EmailReadTool } from "../src/tools/email-read";
-import { EmailSearchTool } from "../src/tools/email-search";
-import { EmailSendTool } from "../src/tools/email-send";
-import { EmailReplyTool } from "../src/tools/email-reply";
-import { EmailForwardTool } from "../src/tools/email-forward";
-import { EmailDeleteTool } from "../src/tools/email-delete";
-import { EmailMoveTool } from "../src/tools/email-move";
-import { EmailFlagTool } from "../src/tools/email-flag";
+import { EmailSetupTool } from "../src/tools/email-setup.ts";
+import { EmailStatusTool } from "../src/tools/email-status.ts";
+import { EmailListMailboxesTool } from "../src/tools/email-list-mailboxes.ts";
+import { EmailFetchTool } from "../src/tools/email-fetch.ts";
+import { EmailReadTool } from "../src/tools/email-read.ts";
+import { EmailSearchTool } from "../src/tools/email-search.ts";
+import { EmailSendTool } from "../src/tools/email-send.ts";
+import { EmailReplyTool } from "../src/tools/email-reply.ts";
+import { EmailForwardTool } from "../src/tools/email-forward.ts";
+import { EmailDeleteTool } from "../src/tools/email-delete.ts";
+import { EmailMoveTool } from "../src/tools/email-move.ts";
+import { EmailFlagTool } from "../src/tools/email-flag.ts";
 
 const allTools = [
   EmailSetupTool,
@@ -34,44 +35,44 @@ const allTools = [
 
 describe("Tool structure smoke test", () => {
   it("has exactly 12 tools", () => {
-    expect(allTools).toHaveLength(12);
+    assert.strictEqual(allTools.length, 12);
   });
 
   for (const tool of allTools) {
     it(`${tool.name} has required fields`, () => {
-      expect(tool.name).toBeTruthy();
-      expect(typeof tool.name).toBe("string");
-      expect(tool.label).toBeTruthy();
-      expect(typeof tool.label).toBe("string");
-      expect(tool.description).toBeTruthy();
-      expect(typeof tool.description).toBe("string");
-      expect(tool.parameters).toBeDefined();
-      expect(typeof tool.execute).toBe("function");
+      assert.ok(tool.name);
+      assert.strictEqual(typeof tool.name, "string");
+      assert.ok(tool.label);
+      assert.strictEqual(typeof tool.label, "string");
+      assert.ok(tool.description);
+      assert.strictEqual(typeof tool.description, "string");
+      assert.ok(tool.parameters !== undefined);
+      assert.strictEqual(typeof tool.execute, "function");
     });
   }
 
   it("all tool names are unique", () => {
     const names = allTools.map((t) => t.name);
-    expect(new Set(names).size).toBe(names.length);
+    assert.strictEqual(new Set(names).size, names.length);
   });
 
   it("all tool names follow email_ prefix convention", () => {
     for (const tool of allTools) {
-      expect(tool.name).toMatch(/^email_/);
+      assert.ok(/^email_/.test(tool.name));
     }
   });
 });
 
 describe("Config module", () => {
   it("loadConfig and getConfig are importable", async () => {
-    const mod = await import("../src/config");
-    expect(typeof mod.loadConfig).toBe("function");
-    expect(typeof mod.getConfig).toBe("function");
-    expect(typeof mod.resolveConfig).toBe("function");
-    expect(typeof mod.saveProfile).toBe("function");
-    expect(typeof mod.getProfiles).toBe("function");
-    expect(typeof mod.getActiveProfile).toBe("function");
-    expect(typeof mod.setActiveProfile).toBe("function");
-    expect(typeof mod.deleteProfile).toBe("function");
+    const mod = await import("../src/config.ts");
+    assert.strictEqual(typeof mod.loadConfig, "function");
+    assert.strictEqual(typeof mod.getConfig, "function");
+    assert.strictEqual(typeof mod.resolveConfig, "function");
+    assert.strictEqual(typeof mod.saveProfile, "function");
+    assert.strictEqual(typeof mod.getProfiles, "function");
+    assert.strictEqual(typeof mod.getActiveProfile, "function");
+    assert.strictEqual(typeof mod.setActiveProfile, "function");
+    assert.strictEqual(typeof mod.deleteProfile, "function");
   });
 });

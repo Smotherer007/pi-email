@@ -27,19 +27,19 @@
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
-import { loadConfig, getConfig } from "./src/config";
-import { EmailSetupTool } from "./src/tools/email-setup";
-import { EmailListMailboxesTool } from "./src/tools/email-list-mailboxes";
-import { EmailFetchTool } from "./src/tools/email-fetch";
-import { EmailReadTool } from "./src/tools/email-read";
-import { EmailSearchTool } from "./src/tools/email-search";
-import { EmailSendTool } from "./src/tools/email-send";
-import { EmailReplyTool } from "./src/tools/email-reply";
-import { EmailForwardTool } from "./src/tools/email-forward";
-import { EmailDeleteTool } from "./src/tools/email-delete";
-import { EmailMoveTool } from "./src/tools/email-move";
-import { EmailFlagTool } from "./src/tools/email-flag";
-import { EmailStatusTool } from "./src/tools/email-status";
+import { loadConfig, getConfig } from "./src/config.ts";
+import { EmailSetupTool } from "./src/tools/email-setup.ts";
+import { EmailListMailboxesTool } from "./src/tools/email-list-mailboxes.ts";
+import { EmailFetchTool } from "./src/tools/email-fetch.ts";
+import { EmailReadTool } from "./src/tools/email-read.ts";
+import { EmailSearchTool } from "./src/tools/email-search.ts";
+import { EmailSendTool } from "./src/tools/email-send.ts";
+import { EmailReplyTool } from "./src/tools/email-reply.ts";
+import { EmailForwardTool } from "./src/tools/email-forward.ts";
+import { EmailDeleteTool } from "./src/tools/email-delete.ts";
+import { EmailMoveTool } from "./src/tools/email-move.ts";
+import { EmailFlagTool } from "./src/tools/email-flag.ts";
+import { EmailStatusTool } from "./src/tools/email-status.ts";
 
 export default function (pi: ExtensionAPI) {
   // Load saved config on startup

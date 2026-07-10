@@ -1,16 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import type { EmailConfig } from "../src/types";
+import { describe, it, before, mock } from "node:test";
+import assert from "node:assert/strict";
+import type { EmailConfig } from "../src/types.ts";
 
-const { createTransport, sendMail } = vi.hoisted(() => ({
-  createTransport: vi.fn(),
-  sendMail: vi.fn(),
-}));
-
-vi.mock("nodemailer", () => ({
-  default: { createTransport },
-}));
-
-import { sendEmail } from "../src/clients/smtp-client";
+let sendEmail: any;
+let mockCreateTransport: any;
+let mockSendMail: any;
 
 const config: EmailConfig = {
   imap: {
@@ -30,15 +24,21 @@ const config: EmailConfig = {
   fromName: "Sender",
 };
 
-beforeEach(() => {
-  sendMail.mockReset();
-  sendMail.mockResolvedValue({ messageId: "message-1" });
-  createTransport.mockReset();
-  createTransport.mockReturnValue({ sendMail });
+before(async () => {
+  mockSendMail = mock.fn(() => ({ messageId: "message-1" }));
+  mockCreateTransport = mock.fn(() => ({ sendMail: mockSendMail }));
+
+  mock.module("nodemailer", {
+    exports: { default: { createTransport: mockCreateTransport } },
+  });
+
+  ({ sendEmail } = await import("../src/clients/smtp-client.ts"));
 });
 
 describe("sendEmail", () => {
   it("passes local attachment paths to nodemailer", async () => {
+    mockSendMail.mock.resetCalls();
+
     await sendEmail(config, {
       to: "recipient@example.com",
       subject: "Hi",
@@ -46,45 +46,57 @@ describe("sendEmail", () => {
       attachmentPaths: ["/tmp/report.pdf", "notes.txt"],
     });
 
-    expect(sendMail).toHaveBeenCalledWith({
-      from: '"Sender" <sender@example.com>',
-      to: "recipient@example.com",
-      subject: "Hi",
-      text: "Hello",
-      disableUrlAccess: true,
-      attachments: [{ path: "/tmp/report.pdf" }, { path: "notes.txt" }],
-    });
+    assert.strictEqual(mockSendMail.mock.callCount(), 1);
+    const mailArg = mockSendMail.mock.calls[0].arguments[0];
+    assert.strictEqual(mailArg.from, '"Sender" <sender@example.com>');
+    assert.strictEqual(mailArg.to, "recipient@example.com");
+    assert.strictEqual(mailArg.subject, "Hi");
+    assert.strictEqual(mailArg.text, "Hello");
+    assert.strictEqual(mailArg.disableUrlAccess, true);
+    assert.deepStrictEqual(mailArg.attachments, [
+      { path: "/tmp/report.pdf" },
+      { path: "notes.txt" },
+    ]);
   });
 
   it("omits attachments when none are provided", async () => {
+    mockSendMail.mock.resetCalls();
+
     await sendEmail(config, {
       to: "recipient@example.com",
       subject: "Hi",
       body: "Hello",
     });
 
-    expect(sendMail.mock.calls[0][0]).not.toHaveProperty("attachments");
+    const mailArg = mockSendMail.mock.calls[0].arguments[0];
+    assert.strictEqual(mailArg.attachments, undefined);
   });
 
   it("rejects URL and data URI attachments", async () => {
-    await expect(
-      sendEmail(config, {
-        to: "recipient@example.com",
-        subject: "Hi",
-        body: "Hello",
-        attachmentPaths: ["https://example.com/report.pdf"],
-      }),
-    ).rejects.toThrow("Only local attachment paths are supported");
+    mockSendMail.mock.resetCalls();
 
-    await expect(
-      sendEmail(config, {
-        to: "recipient@example.com",
-        subject: "Hi",
-        body: "Hello",
-        attachmentPaths: ["data:text/plain;base64,SGVsbG8="],
-      }),
-    ).rejects.toThrow("Only local attachment paths are supported");
+    await assert.rejects(
+      () =>
+        sendEmail(config, {
+          to: "recipient@example.com",
+          subject: "Hi",
+          body: "Hello",
+          attachmentPaths: ["https://example.com/report.pdf"],
+        }),
+      /Only local attachment paths are supported/,
+    );
 
-    expect(sendMail).not.toHaveBeenCalled();
+    await assert.rejects(
+      () =>
+        sendEmail(config, {
+          to: "recipient@example.com",
+          subject: "Hi",
+          body: "Hello",
+          attachmentPaths: ["data:text/plain;base64,SGVsbG8="],
+        }),
+      /Only local attachment paths are supported/,
+    );
+
+    assert.strictEqual(mockSendMail.mock.callCount(), 0);
   });
 });

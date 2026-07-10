@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
@@ -6,19 +7,19 @@ import {
   pdftotextAvailable,
   extractPdfText,
   extractPdfsFromAttachments,
-} from "../src/pdf-reader";
+} from "../src/pdf-reader.ts";
 
 describe("pdftotextAvailable", () => {
   it("returns a boolean", async () => {
     const result = await pdftotextAvailable();
-    expect(typeof result).toBe("boolean");
+    assert.strictEqual(typeof result, "boolean");
   });
 });
 
 describe("extractPdfText", () => {
   it("returns empty string for non-existent file", async () => {
     const result = await extractPdfText("/tmp/does-not-exist-12345.pdf");
-    expect(result).toBe("");
+    assert.strictEqual(result, "");
   });
 
   it("returns empty string for non-PDF file", async () => {
@@ -26,7 +27,7 @@ describe("extractPdfText", () => {
     fs.writeFileSync(tmpFile, "hello");
     try {
       const result = await extractPdfText(tmpFile);
-      expect(result).toBe("");
+      assert.strictEqual(result, "");
     } finally {
       fs.unlinkSync(tmpFile);
     }
@@ -36,7 +37,7 @@ describe("extractPdfText", () => {
 describe("extractPdfsFromAttachments", () => {
   it("returns empty array for empty input", async () => {
     const result = await extractPdfsFromAttachments([]);
-    expect(result).toEqual([]);
+    assert.deepStrictEqual(result, []);
   });
 
   it("skips non-PDF files", async () => {
@@ -44,17 +45,15 @@ describe("extractPdfsFromAttachments", () => {
     fs.writeFileSync(tmpFile, "not a png");
     try {
       const result = await extractPdfsFromAttachments([tmpFile]);
-      expect(result).toEqual([]);
+      assert.deepStrictEqual(result, []);
     } finally {
       fs.unlinkSync(tmpFile);
     }
   });
 
   it("handles non-existent PDF gracefully (returns empty text)", async () => {
-    const result = await extractPdfsFromAttachments([
-      "/tmp/ghost-99999.pdf",
-    ]);
-    expect(result).toEqual([{ filename: "ghost-99999.pdf", text: "" }]);
+    const result = await extractPdfsFromAttachments(["/tmp/ghost-99999.pdf"]);
+    assert.deepStrictEqual(result, [{ filename: "ghost-99999.pdf", text: "" }]);
   });
 
   it("handles mix of PDF and non-PDF files", async () => {
@@ -64,7 +63,7 @@ describe("extractPdfsFromAttachments", () => {
     fs.writeFileSync(pngFile, "png");
     try {
       const result = await extractPdfsFromAttachments([txtFile, pngFile]);
-      expect(result).toEqual([]);
+      assert.deepStrictEqual(result, []);
     } finally {
       fs.unlinkSync(txtFile);
       fs.unlinkSync(pngFile);
@@ -78,6 +77,6 @@ describe("extractPdfsFromAttachments", () => {
       ["/tmp/any.pdf"],
       controller.signal,
     );
-    expect(result).toEqual([]);
+    assert.deepStrictEqual(result, []);
   });
 });

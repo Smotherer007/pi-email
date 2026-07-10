@@ -3,10 +3,10 @@
  */
 
 import { Type } from "typebox";
-import { fetchHeaders } from "../clients/imap-client";
-import { resolveConfig } from "../config";
-import { formatHeaderList } from "../formatting/formatters";
-import type { FetchParams } from "../types";
+import { fetchHeaders } from "../clients/imap-client.ts";
+import { resolveConfig } from "../config.ts";
+import { formatHeaderList } from "../formatting/formatters.ts";
+import type { FetchParams } from "../types.ts";
 
 export const EmailFetchTool = {
   name: "email_fetch",

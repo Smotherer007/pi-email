@@ -3,10 +3,10 @@
  */
 
 import { Type } from "typebox";
-import { sendEmail } from "../clients/smtp-client";
-import { resolveConfig } from "../config";
-import { formatSendResult } from "../formatting/formatters";
-import type { SendParams } from "../types";
+import { sendEmail } from "../clients/smtp-client.ts";
+import { resolveConfig } from "../config.ts";
+import { formatSendResult } from "../formatting/formatters.ts";
+import type { SendParams } from "../types.ts";
 
 export const EmailSendTool = {
   name: "email_send",

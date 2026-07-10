@@ -3,9 +3,9 @@
  */
 
 import { Type } from "typebox";
-import { moveEmail } from "../clients/imap-client";
-import { resolveConfig } from "../config";
-import type { MoveParams } from "../types";
+import { moveEmail } from "../clients/imap-client.ts";
+import { resolveConfig } from "../config.ts";
+import type { MoveParams } from "../types.ts";
 
 export const EmailMoveTool = {
   name: "email_move",

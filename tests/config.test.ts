@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, beforeEach, afterEach } from "node:test";
+import assert from "node:assert/strict";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-import type { EmailConfig } from "../src/types";
+import type { EmailConfig } from "../src/types.ts";
 
 const testHome = path.join(os.tmpdir(), "pi-email-test-" + Date.now());
 const testConfigDir = path.join(testHome, ".pi");
@@ -47,7 +48,7 @@ const sampleConfig2: EmailConfig = {
   },
 };
 
-import * as configMod from "../src/config";
+import * as configMod from "../src/config.ts";
 
 describe("Config persistence — multi-profile", () => {
   beforeEach(() => {
@@ -67,35 +68,34 @@ describe("Config persistence — multi-profile", () => {
   });
 
   it("getConfig returns null before any profile is saved", () => {
-    expect(configMod.getConfig()).toBeNull();
+    assert.strictEqual(configMod.getConfig(), null);
   });
 
   it("getConfigOrThrow throws when no profiles", () => {
-    expect(() => configMod.getConfigOrThrow()).toThrow("Email not configured");
+    assert.throws(() => configMod.getConfigOrThrow(), /Email not configured/);
   });
 
   it("loadConfig sets empty state when no file exists", () => {
     configMod.loadConfig();
-    expect(configMod.getConfig()).toBeNull();
-    expect(configMod.getProfiles()).toEqual({});
-    expect(configMod.getActiveProfile()).toBeNull();
+    assert.strictEqual(configMod.getConfig(), null);
+    assert.deepStrictEqual(configMod.getProfiles(), {});
+    assert.strictEqual(configMod.getActiveProfile(), null);
   });
 
   it("saveProfile creates a named profile and sets it active", () => {
     configMod.saveProfile("work", sampleConfig);
 
-    expect(configMod.getActiveProfile()).toBe("work");
-    expect(configMod.getConfig()).toEqual(sampleConfig);
-    expect(configMod.getProfiles()).toHaveProperty("work");
+    assert.strictEqual(configMod.getActiveProfile(), "work");
+    assert.deepStrictEqual(configMod.getConfig(), sampleConfig);
+    assert.ok(configMod.getProfiles().work !== undefined);
   });
 
   it("saveProfile auto-sets first profile as active", () => {
     configMod.saveProfile("work", sampleConfig);
     configMod.saveProfile("personal", sampleConfig2);
 
-    // active should remain "work" since it was the first
-    expect(configMod.getActiveProfile()).toBe("work");
-    expect(Object.keys(configMod.getProfiles())).toHaveLength(2);
+    assert.strictEqual(configMod.getActiveProfile(), "work");
+    assert.strictEqual(Object.keys(configMod.getProfiles()).length, 2);
   });
 
   it("setActiveProfile switches active profile", () => {
@@ -103,14 +103,15 @@ describe("Config persistence — multi-profile", () => {
     configMod.saveProfile("personal", sampleConfig2);
 
     configMod.setActiveProfile("personal");
-    expect(configMod.getActiveProfile()).toBe("personal");
-    expect(configMod.getConfig()).toEqual(sampleConfig2);
+    assert.strictEqual(configMod.getActiveProfile(), "personal");
+    assert.deepStrictEqual(configMod.getConfig(), sampleConfig2);
   });
 
   it("setActiveProfile throws for unknown profile", () => {
     configMod.saveProfile("work", sampleConfig);
-    expect(() => configMod.setActiveProfile("nonexistent")).toThrow(
-      'Profile "nonexistent" does not exist',
+    assert.throws(
+      () => configMod.setActiveProfile("nonexistent"),
+      /"nonexistent" does not exist/,
     );
   });
 
@@ -118,13 +119,13 @@ describe("Config persistence — multi-profile", () => {
     configMod.saveProfile("work", sampleConfig);
     configMod.saveProfile("personal", sampleConfig2);
 
-    expect(configMod.deleteProfile("work")).toBe(true);
-    expect(configMod.getActiveProfile()).toBe("personal");
-    expect(configMod.getProfile("work")).toBeNull();
+    assert.strictEqual(configMod.deleteProfile("work"), true);
+    assert.strictEqual(configMod.getActiveProfile(), "personal");
+    assert.strictEqual(configMod.getProfile("work"), null);
   });
 
   it("deleteProfile returns false for unknown profile", () => {
-    expect(configMod.deleteProfile("ghost")).toBe(false);
+    assert.strictEqual(configMod.deleteProfile("ghost"), false);
   });
 
   it("resolveConfig returns specific profile by name", () => {
@@ -133,7 +134,7 @@ describe("Config persistence — multi-profile", () => {
     configMod.setActiveProfile("work");
 
     const cfg = configMod.resolveConfig("personal");
-    expect(cfg).toEqual(sampleConfig2);
+    assert.deepStrictEqual(cfg, sampleConfig2);
   });
 
   it("resolveConfig falls back to active profile", () => {
@@ -141,13 +142,14 @@ describe("Config persistence — multi-profile", () => {
     configMod.setActiveProfile("work");
 
     const cfg = configMod.resolveConfig();
-    expect(cfg).toEqual(sampleConfig);
+    assert.deepStrictEqual(cfg, sampleConfig);
   });
 
   it("resolveConfig throws for unknown profile", () => {
     configMod.saveProfile("work", sampleConfig);
-    expect(() => configMod.resolveConfig("ghost")).toThrow(
-      'Profile "ghost" not found',
+    assert.throws(
+      () => configMod.resolveConfig("ghost"),
+      /"ghost" not found/,
     );
   });
 
@@ -155,41 +157,37 @@ describe("Config persistence — multi-profile", () => {
     configMod.saveProfile("work", sampleConfig);
     configMod.saveProfile("personal", sampleConfig2);
 
-    // Simulate fresh load
     configMod._resetForTesting();
     configMod.loadConfig();
 
-    expect(Object.keys(configMod.getProfiles())).toHaveLength(2);
-    expect(configMod.getActiveProfile()).toBe("work");
-    expect(configMod.getProfile("work")).toEqual(sampleConfig);
-    expect(configMod.getProfile("personal")).toEqual(sampleConfig2);
+    assert.strictEqual(Object.keys(configMod.getProfiles()).length, 2);
+    assert.strictEqual(configMod.getActiveProfile(), "work");
+    assert.deepStrictEqual(configMod.getProfile("work"), sampleConfig);
+    assert.deepStrictEqual(configMod.getProfile("personal"), sampleConfig2);
   });
 
   it("backward-compat: migrates old flat config format", () => {
-    // Write old flat format
     fs.writeFileSync(testConfigFile, JSON.stringify(sampleConfig, null, 2));
 
     configMod.loadConfig();
 
-    expect(Object.keys(configMod.getProfiles())).toHaveLength(1);
-    expect(configMod.getActiveProfile()).toBe("default");
-    expect(configMod.getProfile("default")).toEqual(sampleConfig);
+    assert.strictEqual(Object.keys(configMod.getProfiles()).length, 1);
+    assert.strictEqual(configMod.getActiveProfile(), "default");
+    assert.deepStrictEqual(configMod.getProfile("default"), sampleConfig);
 
-    // Verify it persists in new format
     const raw = fs.readFileSync(testConfigFile, "utf-8");
     const parsed = JSON.parse(raw);
-    expect(parsed.profiles.default).toEqual(sampleConfig);
-    expect(parsed.activeProfile).toBe("default");
+    assert.deepStrictEqual(parsed.profiles.default, sampleConfig);
+    assert.strictEqual(parsed.activeProfile, "default");
   });
 
   it("loadConfig handles invalid JSON gracefully", () => {
     fs.writeFileSync(testConfigFile, "not valid json");
     configMod.loadConfig();
-    expect(configMod.getConfig()).toBeNull();
+    assert.strictEqual(configMod.getConfig(), null);
   });
 
   it("loadConfig falls back to first profile if activeProfile is stale", () => {
-    // Write a profiles file with a stale activeProfile
     const staleData = {
       profiles: { work: sampleConfig, personal: sampleConfig2 },
       activeProfile: "deleted",
@@ -197,6 +195,6 @@ describe("Config persistence — multi-profile", () => {
     fs.writeFileSync(testConfigFile, JSON.stringify(staleData, null, 2));
 
     configMod.loadConfig();
-    expect(configMod.getActiveProfile()).toBe("work");
+    assert.strictEqual(configMod.getActiveProfile(), "work");
   });
 });

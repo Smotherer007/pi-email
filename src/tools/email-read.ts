@@ -3,11 +3,11 @@
  */
 
 import { Type } from "typebox";
-import { readEmail } from "../clients/imap-client";
-import { resolveConfig } from "../config";
-import { formatEmailBody } from "../formatting/formatters";
-import { extractPdfsFromAttachments } from "../pdf-reader";
-import type { AttachmentInfo, EmailBody, PdfContent, ReadParams } from "../types";
+import { readEmail } from "../clients/imap-client.ts";
+import { resolveConfig } from "../config.ts";
+import { formatEmailBody } from "../formatting/formatters.ts";
+import { extractPdfsFromAttachments } from "../pdf-reader.ts";
+import type { AttachmentInfo, EmailBody, PdfContent, ReadParams } from "../types.ts";
 
 export const EmailReadTool = {
   name: "email_read",

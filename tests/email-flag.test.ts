@@ -1,36 +1,44 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, before, mock } from "node:test";
+import assert from "node:assert/strict";
 
-// Mock the IMAP client before importing the tool
-vi.mock("../src/clients/imap-client", () => ({
-  connectImap: vi.fn(),
-}));
+let EmailFlagTool: any;
+let mockOpenBox: any;
+let mockAddFlags: any;
+let mockDelFlags: any;
+let mockEnd: any;
 
-vi.mock("../src/config", () => ({
-  resolveConfig: vi.fn(() => ({
-    imap: { host: "imap.test.com", port: 993, tls: true, user: "test@test.com", password: "pw" },
-    smtp: { host: "smtp.test.com", port: 587, secure: false, user: "test@test.com", password: "pw" },
-  })),
-}));
+before(async () => {
+  mockOpenBox = mock.fn((_box: any, _readonly: any, cb: any) => cb(null));
+  mockAddFlags = mock.fn((_uid: any, _flags: any, cb: any) => cb(null));
+  mockDelFlags = mock.fn((_uid: any, _flags: any, cb: any) => cb(null));
+  mockEnd = mock.fn();
 
-import { EmailFlagTool } from "../src/tools/email-flag";
-import { connectImap } from "../src/clients/imap-client";
-
-describe("EmailFlagTool", () => {
-  let mockImap: any;
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockImap = {
-      openBox: vi.fn((_box: string, _readonly: boolean, cb: (err: any) => void) => cb(null)),
-      addFlags: vi.fn((_uid: number, _flags: string[], cb: (err: any) => void) => cb(null)),
-      delFlags: vi.fn((_uid: number, _flags: string[], cb: (err: any) => void) => cb(null)),
-      end: vi.fn(),
-    };
-    (connectImap as any).mockResolvedValue(mockImap);
+  mock.module("../src/clients/imap-client.ts", {
+    exports: {
+      connectImap: mock.fn(() => Promise.resolve({
+        openBox: mockOpenBox,
+        addFlags: mockAddFlags,
+        delFlags: mockDelFlags,
+        end: mockEnd,
+      })),
+    },
   });
 
+  mock.module("../src/config.ts", {
+    exports: {
+      resolveConfig: mock.fn(() => ({
+        imap: { host: "imap.test.com", port: 993, tls: true, user: "test@test.com", password: "pw" },
+        smtp: { host: "smtp.test.com", port: 587, secure: false, user: "test@test.com", password: "pw" },
+      })),
+    },
+  });
+
+  ({ EmailFlagTool } = await import("../src/tools/email-flag.ts"));
+});
+
+describe("EmailFlagTool", () => {
   it("has correct tool name", () => {
-    expect(EmailFlagTool.name).toBe("email_flag");
+    assert.strictEqual(EmailFlagTool.name, "email_flag");
   });
 
   it("returns message when no flags specified", async () => {
@@ -39,83 +47,112 @@ describe("EmailFlagTool", () => {
       { uid: 42 },
       new AbortController().signal,
     );
-    expect(result.content[0].text).toContain("No flags specified");
+    assert.ok(result.content[0].text.includes("No flags specified"));
   });
 
   it("adds Seen flag to mark as read", async () => {
+    mockAddFlags.mock.resetCalls();
+
     const result = await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["Seen"] },
       new AbortController().signal,
     );
-    expect(result.content[0].text).toContain("flags updated");
-    expect(result.content[0].text).toContain("added: \\Seen");
-    expect(mockImap.addFlags).toHaveBeenCalledWith(42, ["\\Seen"], expect.any(Function));
+    assert.ok(result.content[0].text.includes("flags updated"));
+    assert.ok(result.content[0].text.includes("added: \\Seen"));
+
+    assert.strictEqual(mockAddFlags.mock.callCount(), 1);
+    const callArgs = mockAddFlags.mock.calls[0].arguments;
+    assert.strictEqual(callArgs[0], 42);
+    assert.deepStrictEqual(callArgs[1], ["\\Seen"]);
   });
 
   it("removes Seen flag to mark as unread", async () => {
+    mockDelFlags.mock.resetCalls();
+
     const result = await EmailFlagTool.execute(
       "call-1",
       { uid: 42, remove: ["unread"] },
       new AbortController().signal,
     );
-    expect(result.content[0].text).toContain("removed: \\Seen");
-    expect(mockImap.delFlags).toHaveBeenCalledWith(42, ["\\Seen"], expect.any(Function));
+    assert.ok(result.content[0].text.includes("removed: \\Seen"));
+
+    const callArgs = mockDelFlags.mock.calls[0].arguments;
+    assert.strictEqual(callArgs[0], 42);
+    assert.deepStrictEqual(callArgs[1], ["\\Seen"]);
   });
 
   it("adds Flagged flag", async () => {
+    mockAddFlags.mock.resetCalls();
+
     const result = await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["starred"] },
       new AbortController().signal,
     );
-    expect(result.content[0].text).toContain("added: \\Flagged");
-    expect(mockImap.addFlags).toHaveBeenCalledWith(42, ["\\Flagged"], expect.any(Function));
+    assert.ok(result.content[0].text.includes("added: \\Flagged"));
+
+    const callArgs = mockAddFlags.mock.calls[0].arguments;
+    assert.deepStrictEqual(callArgs[1], ["\\Flagged"]);
   });
 
   it("adds and removes flags simultaneously", async () => {
+    mockAddFlags.mock.resetCalls();
+    mockDelFlags.mock.resetCalls();
+
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["Seen"], remove: ["Flagged"] },
       new AbortController().signal,
     );
-    expect(mockImap.addFlags).toHaveBeenCalledWith(42, ["\\Seen"], expect.any(Function));
-    expect(mockImap.delFlags).toHaveBeenCalledWith(42, ["\\Flagged"], expect.any(Function));
+
+    assert.strictEqual(mockAddFlags.mock.callCount(), 1);
+    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\Seen"]);
+    assert.strictEqual(mockDelFlags.mock.callCount(), 1);
+    assert.deepStrictEqual(mockDelFlags.mock.calls[0].arguments[1], ["\\Flagged"]);
   });
 
   it("handles already-prefixed flags", async () => {
+    mockAddFlags.mock.resetCalls();
+
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["\\Seen"] },
       new AbortController().signal,
     );
-    expect(mockImap.addFlags).toHaveBeenCalledWith(42, ["\\Seen"], expect.any(Function));
+    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\Seen"]);
   });
 
   it("handles 'read' alias for Seen", async () => {
+    mockAddFlags.mock.resetCalls();
+
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["read"] },
       new AbortController().signal,
     );
-    expect(mockImap.addFlags).toHaveBeenCalledWith(42, ["\\Seen"], expect.any(Function));
+    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\Seen"]);
   });
 
   it("handles 'replied' alias for Answered", async () => {
+    mockAddFlags.mock.resetCalls();
+
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["replied"] },
       new AbortController().signal,
     );
-    expect(mockImap.addFlags).toHaveBeenCalledWith(42, ["\\Answered"], expect.any(Function));
+    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\Answered"]);
   });
 
   it("passes through unknown flags with backslash prefix", async () => {
+    mockAddFlags.mock.resetCalls();
+
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["CustomFlag"] },
       new AbortController().signal,
     );
-    expect(mockImap.addFlags).toHaveBeenCalledWith(42, ["\\CustomFlag"], expect.any(Function));
+    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\CustomFlag"]);
   });
 });

@@ -5,7 +5,7 @@
  * No emojis, no side effects.
  */
 
-import type { EmailBody, EmailHeader, MailboxInfo, SendResult } from "../types";
+import type { EmailBody, EmailHeader, MailboxInfo, SendResult } from "../types.ts";
 
 // Mailbox list
 

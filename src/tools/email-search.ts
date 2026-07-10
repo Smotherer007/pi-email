@@ -3,10 +3,10 @@
  */
 
 import { Type } from "typebox";
-import { searchEmails } from "../clients/imap-client";
-import { resolveConfig } from "../config";
-import { formatSearchResults } from "../formatting/formatters";
-import type { SearchParams } from "../types";
+import { searchEmails } from "../clients/imap-client.ts";
+import { resolveConfig } from "../config.ts";
+import { formatSearchResults } from "../formatting/formatters.ts";
+import type { SearchParams } from "../types.ts";
 
 export const EmailSearchTool = {
   name: "email_search",

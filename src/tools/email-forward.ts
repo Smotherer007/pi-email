@@ -7,9 +7,9 @@
  */
 
 import { Type } from "typebox";
-import { readEmail } from "../clients/imap-client";
-import { sendEmail } from "../clients/smtp-client";
-import { resolveConfig } from "../config";
+import { readEmail } from "../clients/imap-client.ts";
+import { sendEmail } from "../clients/smtp-client.ts";
+import { resolveConfig } from "../config.ts";
 
 export const EmailForwardTool = {
   name: "email_forward",

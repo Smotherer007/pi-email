@@ -3,9 +3,9 @@
  */
 
 import { Type } from "typebox";
-import { listMailboxes } from "../clients/imap-client";
-import { resolveConfig } from "../config";
-import { formatMailboxList } from "../formatting/formatters";
+import { listMailboxes } from "../clients/imap-client.ts";
+import { resolveConfig } from "../config.ts";
+import { formatMailboxList } from "../formatting/formatters.ts";
 
 
 export const EmailListMailboxesTool = {

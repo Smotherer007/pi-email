@@ -6,9 +6,9 @@
  */
 
 import { Type } from "typebox";
-import { connectImap } from "../clients/imap-client";
-import type { EmailConfig } from "../types";
-import { resolveConfig } from "../config";
+import { connectImap } from "../clients/imap-client.ts";
+import type { EmailConfig } from "../types.ts";
+import { resolveConfig } from "../config.ts";
 
 export const EmailFlagTool = {
   name: "email_flag",

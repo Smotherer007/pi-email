@@ -11,8 +11,10 @@
  * it is auto-migrated to { profiles: { "default": ... }, activeProfile: "default" }.
  */
 
-import type { EmailConfig, EmailProfiles } from "./types";
-import { EmailNotConfiguredError } from "./types";
+import type { EmailConfig, EmailProfiles } from "./types.ts";
+import { EmailNotConfiguredError } from "./types.ts";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 // Mutable state
 
@@ -22,7 +24,6 @@ let activeProfile: string | null = null;
 // Path resolution
 
 function configPath(): string {
-  const path = require("node:path");
   const home = process.env.HOME || process.env.USERPROFILE || "~";
   return path.join(home, ".pi", "email-config.json");
 }
@@ -30,8 +31,6 @@ function configPath(): string {
 // Persistence
 
 function persistProfiles(): void {
-  const fs = require("node:fs");
-  const path = require("node:path");
   const filePath = configPath();
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
@@ -43,7 +42,6 @@ function persistProfiles(): void {
 
 export function loadConfig(): void {
   try {
-    const fs = require("node:fs");
     const filePath = configPath();
     if (fs.existsSync(filePath)) {
       const raw = JSON.parse(fs.readFileSync(filePath, "utf-8"));

@@ -3,9 +3,9 @@
  */
 
 import { Type } from "typebox";
-import { deleteEmail } from "../clients/imap-client";
-import { resolveConfig } from "../config";
-import type { DeleteParams } from "../types";
+import { deleteEmail } from "../clients/imap-client.ts";
+import { resolveConfig } from "../config.ts";
+import type { DeleteParams } from "../types.ts";
 
 export const EmailDeleteTool = {
   name: "email_delete",

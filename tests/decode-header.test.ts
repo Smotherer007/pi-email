@@ -1,51 +1,47 @@
-import { describe, it, expect } from "vitest";
-import { decodeHeader } from "../src/clients/imap-client";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { decodeHeader } from "../src/clients/imap-client.ts";
 
 describe("decodeHeader", () => {
   it("returns empty string for null/undefined/empty", () => {
-    expect(decodeHeader(null)).toBe("");
-    expect(decodeHeader(undefined)).toBe("");
-    expect(decodeHeader("")).toBe("");
+    assert.strictEqual(decodeHeader(null), "");
+    assert.strictEqual(decodeHeader(undefined), "");
+    assert.strictEqual(decodeHeader(""), "");
   });
 
   it("returns plain text unchanged", () => {
-    expect(decodeHeader("Hello World")).toBe("Hello World");
-    expect(decodeHeader("test@example.com")).toBe("test@example.com");
+    assert.strictEqual(decodeHeader("Hello World"), "Hello World");
+    assert.strictEqual(decodeHeader("test@example.com"), "test@example.com");
   });
 
   it("decodes base64 (B) encoded UTF-8 text", () => {
-    // "Patri ck" in UTF-8 base64 = UGF0cmljayBXZXBwZWxtYW5u
     const encoded = "=?UTF-8?B?UGF0cmljayBXZXBwZWxtYW5u?=";
-    expect(decodeHeader(encoded)).toBe("Patrick Weppelmann");
+    assert.strictEqual(decodeHeader(encoded), "Patrick Weppelmann");
   });
 
   it("decodes quoted-printable (Q) encoded text", () => {
-    // Q encoding: =C3=A4 = ä in UTF-8
     const encoded = "=?UTF-8?Q?Gr=C3=BC=C3=9F_Gott?=";
-    expect(decodeHeader(encoded)).toBe("Grüß Gott");
+    assert.strictEqual(decodeHeader(encoded), "Grüß Gott");
   });
 
   it("decodes mixed encoded and plain text", () => {
     const mixed = "Re: =?UTF-8?B?VGVzdCBFbWFpbA==?= from me";
-    expect(decodeHeader(mixed)).toBe("Re: Test Email from me");
+    assert.strictEqual(decodeHeader(mixed), "Re: Test Email from me");
   });
 
   it("decodes multiple encoded words", () => {
-    // Multiple encoded words separated by whitespace — space is preserved per RFC 2047
     const multi = "=?UTF-8?B?SGVsbG8=?= =?UTF-8?B?V29ybGQ=?=";
-    expect(decodeHeader(multi)).toBe("Hello World");
+    assert.strictEqual(decodeHeader(multi), "Hello World");
   });
 
   it("handles Q encoding with underscores as spaces", () => {
     const encoded = "=?UTF-8?Q?Hello_World?=";
-    expect(decodeHeader(encoded)).toBe("Hello World");
+    assert.strictEqual(decodeHeader(encoded), "Hello World");
   });
 
   it("handles invalid encoding gracefully", () => {
-    // Invalid base64
     const bad = "=?UTF-8?B?!!!invalid!!!?=";
-    // Should return something without throwing
     const result = decodeHeader(bad);
-    expect(typeof result).toBe("string");
+    assert.strictEqual(typeof result, "string");
   });
 });
