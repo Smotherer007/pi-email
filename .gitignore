@@ -4,3 +4,4 @@ coverage/
 *.png
 *.jpg
 .DS_Store
+graph-out/cache/

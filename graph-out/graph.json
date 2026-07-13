@@ -1,0 +1,1636 @@
+{
+  "nodes": [
+    {
+      "id": "index_file",
+      "label": "index.ts",
+      "type": "file",
+      "sourceFile": "index.ts",
+      "centrality": 0.054,
+      "community": 74
+    },
+    {
+      "id": "package_file",
+      "label": "package.json",
+      "type": "file",
+      "sourceFile": "package.json",
+      "centrality": 0.074,
+      "community": 2
+    },
+    {
+      "id": "package_name",
+      "label": "name",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_version",
+      "label": "version",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_description",
+      "label": "description",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_keywords",
+      "label": "keywords",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_author",
+      "label": "author",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_license",
+      "label": "license",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_type",
+      "label": "type",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_engines",
+      "label": "engines",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_repository",
+      "label": "repository",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_bugs",
+      "label": "bugs",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_dependencies",
+      "label": "dependencies",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_overrides",
+      "label": "overrides",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_publishConfig",
+      "label": "publishConfig",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_devDependencies",
+      "label": "devDependencies",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "package_pi",
+      "label": "pi",
+      "type": "field",
+      "sourceFile": "package.json",
+      "centrality": 0.005,
+      "community": 2
+    },
+    {
+      "id": "release.config_file",
+      "label": "release.config.cjs",
+      "type": "file",
+      "sourceFile": "release.config.cjs",
+      "centrality": 0.001,
+      "community": 18
+    },
+    {
+      "id": "src_clients_imap-client_file",
+      "label": "src/clients/imap-client.ts",
+      "type": "file",
+      "sourceFile": "src/clients/imap-client.ts",
+      "centrality": 0.02,
+      "community": 22
+    },
+    {
+      "id": "src_clients_imap-client_connectImap",
+      "label": "connectImap",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L17",
+      "centrality": 0.018,
+      "community": 20
+    },
+    {
+      "id": "src_clients_imap-client_decodeHeader",
+      "label": "decodeHeader",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L38",
+      "centrality": 0.008,
+      "community": 22
+    },
+    {
+      "id": "src_clients_imap-client_listMailboxes",
+      "label": "listMailboxes",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L66",
+      "centrality": 0.006,
+      "community": 22
+    },
+    {
+      "id": "src_clients_imap-client_fetchHeaders",
+      "label": "fetchHeaders",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L93",
+      "centrality": 0.008,
+      "community": 22
+    },
+    {
+      "id": "src_clients_imap-client_readEmail",
+      "label": "readEmail",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L212",
+      "centrality": 0.006,
+      "community": 22
+    },
+    {
+      "id": "src_clients_imap-client_searchEmails",
+      "label": "searchEmails",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L301",
+      "centrality": 0.008,
+      "community": 22
+    },
+    {
+      "id": "src_clients_imap-client_deleteEmail",
+      "label": "deleteEmail",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L402",
+      "centrality": 0.006,
+      "community": 22
+    },
+    {
+      "id": "src_clients_imap-client_moveEmail",
+      "label": "moveEmail",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L433",
+      "centrality": 0.006,
+      "community": 22
+    },
+    {
+      "id": "src_clients_smtp-client_file",
+      "label": "src/clients/smtp-client.ts",
+      "type": "file",
+      "sourceFile": "src/clients/smtp-client.ts",
+      "centrality": 0.014,
+      "community": 29
+    },
+    {
+      "id": "src_clients_smtp-client_SendOptions",
+      "label": "SendOptions",
+      "type": "interface",
+      "sourceFile": "src/clients/smtp-client.ts",
+      "sourceLocation": "L11",
+      "centrality": 0.007,
+      "community": 29
+    },
+    {
+      "id": "src_clients_smtp-client_sendEmail",
+      "label": "sendEmail",
+      "type": "function",
+      "sourceFile": "src/clients/smtp-client.ts",
+      "sourceLocation": "L16",
+      "centrality": 0.007,
+      "community": 29
+    },
+    {
+      "id": "src_config_file",
+      "label": "src/config.ts",
+      "type": "file",
+      "sourceFile": "src/config.ts",
+      "centrality": 0.045,
+      "community": 74
+    },
+    {
+      "id": "src_config_configPath",
+      "label": "configPath",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L26",
+      "centrality": 0.009,
+      "community": 74
+    },
+    {
+      "id": "src_config_persistProfiles",
+      "label": "persistProfiles",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L33",
+      "centrality": 0.017,
+      "community": 74
+    },
+    {
+      "id": "src_config_loadConfig",
+      "label": "loadConfig",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L43",
+      "centrality": 0.009,
+      "community": 74
+    },
+    {
+      "id": "src_config_getConfig",
+      "label": "getConfig",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L81",
+      "centrality": 0.007,
+      "community": 74
+    },
+    {
+      "id": "src_config_getConfigOrThrow",
+      "label": "getConfigOrThrow",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L86",
+      "centrality": 0.009,
+      "community": 74
+    },
+    {
+      "id": "src_config_getProfile",
+      "label": "getProfile",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L95",
+      "centrality": 0.007,
+      "community": 74
+    },
+    {
+      "id": "src_config_resolveConfig",
+      "label": "resolveConfig",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L103",
+      "centrality": 0.009,
+      "community": 74
+    },
+    {
+      "id": "src_config_getProfiles",
+      "label": "getProfiles",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L116",
+      "centrality": 0.004,
+      "community": 74
+    },
+    {
+      "id": "src_config_getActiveProfile",
+      "label": "getActiveProfile",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L120",
+      "centrality": 0.004,
+      "community": 74
+    },
+    {
+      "id": "src_config_saveProfile",
+      "label": "saveProfile",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L126",
+      "centrality": 0.006,
+      "community": 74
+    },
+    {
+      "id": "src_config_setActiveProfile",
+      "label": "setActiveProfile",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L135",
+      "centrality": 0.006,
+      "community": 74
+    },
+    {
+      "id": "src_config_deleteProfile",
+      "label": "deleteProfile",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L145",
+      "centrality": 0.006,
+      "community": 74
+    },
+    {
+      "id": "src_config__resetForTesting",
+      "label": "_resetForTesting",
+      "type": "function",
+      "sourceFile": "src/config.ts",
+      "sourceLocation": "L157",
+      "centrality": 0.004,
+      "community": 74
+    },
+    {
+      "id": "src_formatting_formatters_file",
+      "label": "src/formatting/formatters.ts",
+      "type": "file",
+      "sourceFile": "src/formatting/formatters.ts",
+      "centrality": 0.039,
+      "community": 46
+    },
+    {
+      "id": "src_formatting_formatters_formatMailboxList",
+      "label": "formatMailboxList",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L12",
+      "centrality": 0.006,
+      "community": 46
+    },
+    {
+      "id": "src_formatting_formatters_formatHeaderList",
+      "label": "formatHeaderList",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L35",
+      "centrality": 0.006,
+      "community": 46
+    },
+    {
+      "id": "src_formatting_formatters_formatEmailBody",
+      "label": "formatEmailBody",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L66",
+      "centrality": 0.006,
+      "community": 46
+    },
+    {
+      "id": "src_formatting_formatters_formatSearchResults",
+      "label": "formatSearchResults",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L129",
+      "centrality": 0.006,
+      "community": 46
+    },
+    {
+      "id": "src_formatting_formatters_formatSendResult",
+      "label": "formatSendResult",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L158",
+      "centrality": 0.006,
+      "community": 46
+    },
+    {
+      "id": "src_formatting_formatters_formatNotConfiguredStatus",
+      "label": "formatNotConfiguredStatus",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L169",
+      "centrality": 0.006,
+      "community": 46
+    },
+    {
+      "id": "src_formatting_formatters_formatProfileStatus",
+      "label": "formatProfileStatus",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L173",
+      "centrality": 0.006,
+      "community": 46
+    },
+    {
+      "id": "src_formatting_formatters_formatConfiguredStatus",
+      "label": "formatConfiguredStatus",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L200",
+      "centrality": 0.006,
+      "community": 46
+    },
+    {
+      "id": "src_pdf-reader_file",
+      "label": "src/pdf-reader.ts",
+      "type": "file",
+      "sourceFile": "src/pdf-reader.ts",
+      "centrality": 0.018,
+      "community": 55
+    },
+    {
+      "id": "src_pdf-reader_PdfContent",
+      "label": "PdfContent",
+      "type": "interface",
+      "sourceFile": "src/pdf-reader.ts",
+      "sourceLocation": "L15",
+      "centrality": 0.005,
+      "community": 55
+    },
+    {
+      "id": "src_pdf-reader_pdftotextAvailable",
+      "label": "pdftotextAvailable",
+      "type": "function",
+      "sourceFile": "src/pdf-reader.ts",
+      "sourceLocation": "L23",
+      "centrality": 0.005,
+      "community": 55
+    },
+    {
+      "id": "src_pdf-reader_extractPdfText",
+      "label": "extractPdfText",
+      "type": "function",
+      "sourceFile": "src/pdf-reader.ts",
+      "sourceLocation": "L36",
+      "centrality": 0.009,
+      "community": 55
+    },
+    {
+      "id": "src_pdf-reader_extractPdfsFromAttachments",
+      "label": "extractPdfsFromAttachments",
+      "type": "function",
+      "sourceFile": "src/pdf-reader.ts",
+      "sourceLocation": "L61",
+      "centrality": 0.009,
+      "community": 55
+    },
+    {
+      "id": "src_tools_email-delete_file",
+      "label": "src/tools/email-delete.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-delete.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-fetch_file",
+      "label": "src/tools/email-fetch.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-fetch.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-flag_file",
+      "label": "src/tools/email-flag.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-flag.ts",
+      "centrality": 0.014,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-flag_toImapFlag",
+      "label": "toImapFlag",
+      "type": "function",
+      "sourceFile": "src/tools/email-flag.ts",
+      "sourceLocation": "L77",
+      "description": "Convert friendly flag names to IMAP flag syntax",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-flag_setFlags",
+      "label": "setFlags",
+      "type": "function",
+      "sourceFile": "src/tools/email-flag.ts",
+      "sourceLocation": "L95",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-forward_file",
+      "label": "src/tools/email-forward.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-forward.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-list-mailboxes_file",
+      "label": "src/tools/email-list-mailboxes.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-list-mailboxes.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-move_file",
+      "label": "src/tools/email-move.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-move.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-read_file",
+      "label": "src/tools/email-read.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-read.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-reply_file",
+      "label": "src/tools/email-reply.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-reply.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-search_file",
+      "label": "src/tools/email-search.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-search.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-send_file",
+      "label": "src/tools/email-send.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-send.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-setup_file",
+      "label": "src/tools/email-setup.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-setup.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_tools_email-status_file",
+      "label": "src/tools/email-status.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-status.ts",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_file",
+      "label": "src/types.ts",
+      "type": "file",
+      "sourceFile": "src/types.ts",
+      "centrality": 0.081,
+      "community": 74
+    },
+    {
+      "id": "src_types_ImapConfig",
+      "label": "ImapConfig",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L10",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_SmtpConfig",
+      "label": "SmtpConfig",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L18",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_EmailConfig",
+      "label": "EmailConfig",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L29",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_EmailProfiles",
+      "label": "EmailProfiles",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L35",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_EmailHeader",
+      "label": "EmailHeader",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L42",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_EmailBody",
+      "label": "EmailBody",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L53",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_PdfContent",
+      "label": "PdfContent",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L65",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_AttachmentInfo",
+      "label": "AttachmentInfo",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L70",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_SendResult",
+      "label": "SendResult",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L76",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_MailboxInfo",
+      "label": "MailboxInfo",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L82",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_EmailNotConfiguredError",
+      "label": "EmailNotConfiguredError",
+      "type": "class",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L90",
+      "centrality": 0.008,
+      "community": 74
+    },
+    {
+      "id": "src_types_EmailNotConfiguredError_constructor",
+      "label": "EmailNotConfiguredError.constructor",
+      "type": "method",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L91",
+      "centrality": 0.008,
+      "community": 74
+    },
+    {
+      "id": "src_types_SetupParams",
+      "label": "SetupParams",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L99",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_FetchParams",
+      "label": "FetchParams",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L115",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_ReadParams",
+      "label": "ReadParams",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L122",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_SearchParams",
+      "label": "SearchParams",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L129",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_SendParams",
+      "label": "SendParams",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L141",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_DeleteParams",
+      "label": "DeleteParams",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L152",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "src_types_MoveParams",
+      "label": "MoveParams",
+      "type": "interface",
+      "sourceFile": "src/types.ts",
+      "sourceLocation": "L158",
+      "centrality": 0.005,
+      "community": 74
+    },
+    {
+      "id": "tests_config.test_file",
+      "label": "tests/config.test.ts",
+      "type": "file",
+      "sourceFile": "tests/config.test.ts",
+      "centrality": 0.009,
+      "community": 94
+    },
+    {
+      "id": "tests_config.test_setEnv",
+      "label": "setEnv",
+      "type": "function",
+      "sourceFile": "tests/config.test.ts",
+      "sourceLocation": "L12",
+      "centrality": 0.009,
+      "community": 94
+    },
+    {
+      "id": "tests_decode-header.test_file",
+      "label": "tests/decode-header.test.ts",
+      "type": "file",
+      "sourceFile": "tests/decode-header.test.ts",
+      "centrality": 0.001,
+      "community": 95
+    },
+    {
+      "id": "tests_email-flag.test_file",
+      "label": "tests/email-flag.test.ts",
+      "type": "file",
+      "sourceFile": "tests/email-flag.test.ts",
+      "centrality": 0.001,
+      "community": 96
+    },
+    {
+      "id": "tests_email-forward.test_file",
+      "label": "tests/email-forward.test.ts",
+      "type": "file",
+      "sourceFile": "tests/email-forward.test.ts",
+      "centrality": 0.009,
+      "community": 98
+    },
+    {
+      "id": "tests_email-forward.test_mockOriginalEmail",
+      "label": "mockOriginalEmail",
+      "type": "function",
+      "sourceFile": "tests/email-forward.test.ts",
+      "sourceLocation": "L8",
+      "centrality": 0.009,
+      "community": 98
+    },
+    {
+      "id": "tests_email-reply.test_file",
+      "label": "tests/email-reply.test.ts",
+      "type": "file",
+      "sourceFile": "tests/email-reply.test.ts",
+      "centrality": 0.009,
+      "community": 100
+    },
+    {
+      "id": "tests_email-reply.test_mockOriginalEmail",
+      "label": "mockOriginalEmail",
+      "type": "function",
+      "sourceFile": "tests/email-reply.test.ts",
+      "sourceLocation": "L8",
+      "centrality": 0.009,
+      "community": 100
+    },
+    {
+      "id": "tests_formatters.test_file",
+      "label": "tests/formatters.test.ts",
+      "type": "file",
+      "sourceFile": "tests/formatters.test.ts",
+      "centrality": 0.001,
+      "community": 101
+    },
+    {
+      "id": "tests_imap-client.test_file",
+      "label": "tests/imap-client.test.ts",
+      "type": "file",
+      "sourceFile": "tests/imap-client.test.ts",
+      "centrality": 0.001,
+      "community": 102
+    },
+    {
+      "id": "tests_pdf-reader.test_file",
+      "label": "tests/pdf-reader.test.ts",
+      "type": "file",
+      "sourceFile": "tests/pdf-reader.test.ts",
+      "centrality": 0.001,
+      "community": 103
+    },
+    {
+      "id": "tests_smoke.test_file",
+      "label": "tests/smoke.test.ts",
+      "type": "file",
+      "sourceFile": "tests/smoke.test.ts",
+      "centrality": 0.001,
+      "community": 104
+    },
+    {
+      "id": "tests_smtp-client.test_file",
+      "label": "tests/smtp-client.test.ts",
+      "type": "file",
+      "sourceFile": "tests/smtp-client.test.ts",
+      "centrality": 0.001,
+      "community": 105
+    },
+    {
+      "id": "tests_types.test_file",
+      "label": "tests/types.test.ts",
+      "type": "file",
+      "sourceFile": "tests/types.test.ts",
+      "centrality": 0.001,
+      "community": 106
+    }
+  ],
+  "edges": [
+    {
+      "source": "index_file",
+      "target": "src_config_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-setup_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-list-mailboxes_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-fetch_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-read_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-search_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-send_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-reply_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-forward_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-delete_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-move_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-flag_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-status_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_name",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_version",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_description",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_keywords",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_author",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_license",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_type",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_engines",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_repository",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_bugs",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_scripts",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_dependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_overrides",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_publishConfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_devDependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "package_file",
+      "target": "package_pi",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_connectImap",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_listMailboxes",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_listMailboxes",
+      "target": "src_clients_imap-client_connectImap",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_fetchHeaders",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_fetchHeaders",
+      "target": "src_clients_imap-client_connectImap",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_fetchHeaders",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_fetchHeaders",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_fetchHeaders",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_fetchHeaders",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_fetchHeaders",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_readEmail",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_readEmail",
+      "target": "src_clients_imap-client_connectImap",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_searchEmails",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_searchEmails",
+      "target": "src_clients_imap-client_connectImap",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_searchEmails",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_searchEmails",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_searchEmails",
+      "target": "src_clients_imap-client_decodeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_deleteEmail",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_deleteEmail",
+      "target": "src_clients_imap-client_connectImap",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_moveEmail",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_moveEmail",
+      "target": "src_clients_imap-client_connectImap",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_clients_smtp-client_file",
+      "target": "src_clients_smtp-client_SendOptions",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_smtp-client_file",
+      "target": "src_clients_smtp-client_sendEmail",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_types_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_types_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_configPath",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_persistProfiles",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_persistProfiles",
+      "target": "src_config_configPath",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_loadConfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_loadConfig",
+      "target": "src_config_configPath",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_loadConfig",
+      "target": "src_config_persistProfiles",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_getConfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_getConfigOrThrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_getConfigOrThrow",
+      "target": "src_config_getConfig",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_getProfile",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_resolveConfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_resolveConfig",
+      "target": "src_config_getProfile",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_resolveConfig",
+      "target": "src_config_getConfigOrThrow",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_getProfiles",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_getActiveProfile",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_saveProfile",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_saveProfile",
+      "target": "src_config_persistProfiles",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_setActiveProfile",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_setActiveProfile",
+      "target": "src_config_persistProfiles",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config_deleteProfile",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_config_deleteProfile",
+      "target": "src_config_persistProfiles",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_config_file",
+      "target": "src_config__resetForTesting",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_formatMailboxList",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_formatHeaderList",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_formatEmailBody",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_formatSearchResults",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_formatSendResult",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_formatNotConfiguredStatus",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_formatProfileStatus",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_formatConfiguredStatus",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_pdf-reader_file",
+      "target": "src_pdf-reader_PdfContent",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_pdf-reader_file",
+      "target": "src_pdf-reader_pdftotextAvailable",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_pdf-reader_file",
+      "target": "src_pdf-reader_extractPdfText",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_pdf-reader_file",
+      "target": "src_pdf-reader_extractPdfsFromAttachments",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_pdf-reader_extractPdfsFromAttachments",
+      "target": "src_pdf-reader_extractPdfText",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_tools_email-flag_file",
+      "target": "src_tools_email-flag_toImapFlag",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_tools_email-flag_file",
+      "target": "src_tools_email-flag_setFlags",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_ImapConfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_SmtpConfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_EmailConfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_EmailProfiles",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_EmailHeader",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_EmailBody",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_PdfContent",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_AttachmentInfo",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_SendResult",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_MailboxInfo",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_EmailNotConfiguredError",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_EmailNotConfiguredError_constructor",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_EmailNotConfiguredError",
+      "target": "src_types_EmailNotConfiguredError_constructor",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_SetupParams",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_FetchParams",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_ReadParams",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_SearchParams",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_SendParams",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_DeleteParams",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_types_file",
+      "target": "src_types_MoveParams",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "tests_config.test_file",
+      "target": "tests_config.test_setEnv",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "tests_email-forward.test_file",
+      "target": "tests_email-forward.test_mockOriginalEmail",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "tests_email-reply.test_file",
+      "target": "tests_email-reply.test_mockOriginalEmail",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    }
+  ]
+}
