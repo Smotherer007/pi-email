@@ -14,6 +14,22 @@ import type { EmailConfig, EmailHeader, MailboxInfo } from "../types.ts";
 
 // Connection
 
+let cachedVersion: string | undefined;
+
+function getClientVersion(): string {
+  if (!cachedVersion) {
+    try {
+      const pkg = JSON.parse(
+        fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+      );
+      cachedVersion = typeof pkg.version === "string" ? pkg.version : "unknown";
+    } catch {
+      cachedVersion = "unknown";
+    }
+  }
+  return cachedVersion;
+}
+
 export function connectImap(config: EmailConfig): Promise<Imap> {
   return new Promise((resolve, reject) => {
     const imap = new Imap({
@@ -27,7 +43,19 @@ export function connectImap(config: EmailConfig): Promise<Imap> {
       authTimeout: 30000,
     });
 
-    imap.once("ready", () => resolve(imap));
+    imap.once("ready", () => {
+      // RFC 2971: identify the client. Required by NetEase (163/126) IMAP,
+      // which rejects mailbox access without it ("Unsafe Login"). Harmless
+      // for servers that merely advertise the ID capability, and skipped
+      // entirely when the server does not. Failures never block login.
+      if (imap.serverSupports("ID")) {
+        imap.id({ name: "pi-email", version: getClientVersion() }, () =>
+          resolve(imap),
+        );
+      } else {
+        resolve(imap);
+      }
+    });
     imap.once("error", (err: Error) => reject(err));
     imap.connect();
   });
