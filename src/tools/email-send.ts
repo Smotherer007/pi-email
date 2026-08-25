@@ -3,16 +3,16 @@
  */
 
 import { Type } from "typebox";
-import { sendEmail } from "../clients/smtp-client.ts";
+import { deliverEmail } from "../delivery.ts";
 import { resolveConfig } from "../config.ts";
-import { formatSendResult } from "../formatting/formatters.ts";
+import { formatSendResult, formatSentCopy } from "../formatting/formatters.ts";
 import type { SendParams } from "../types.ts";
 
 export const EmailSendTool = {
   name: "email_send",
   label: "Send Email",
   description:
-    "Send an email via SMTP. Supports plain text, HTML, CC, BCC, and local file attachments.",
+    "Send an email via SMTP. Supports plain text, HTML, CC, BCC, and local file attachments. A copy is stored in the Sent mailbox unless the provider does that itself.",
   parameters: Type.Object({
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
@@ -42,15 +42,15 @@ export const EmailSendTool = {
   async execute(
     _toolCallId: string,
     params: SendParams,
-    _signal: AbortSignal,
+    signal: AbortSignal,
   ) {
     const config = resolveConfig(params.profile);
-    const result = await sendEmail(config, params);
-    const text = formatSendResult(result);
+    const { result, sentCopy } = await deliverEmail(config, params, signal);
+    const text = `${formatSendResult(result)}\n${formatSentCopy(sentCopy)}`;
 
     return {
       content: [{ type: "text" as const, text }],
-      details: { messageId: result.messageId },
+      details: { messageId: result.messageId, sentCopy },
     };
   },
 };

@@ -6,6 +6,7 @@
  * Tools:
  *   - email_setup: Configure email account credentials
  *   - email_status: Show connection status and config
+ *   - email_profile: List, switch or delete email profiles
  *   - email_list_mailboxes: List available IMAP folders
  *   - email_fetch: Fetch emails from a mailbox
  *   - email_read: Read a specific email by UID
@@ -40,6 +41,7 @@ import { EmailDeleteTool } from "./src/tools/email-delete.ts";
 import { EmailMoveTool } from "./src/tools/email-move.ts";
 import { EmailFlagTool } from "./src/tools/email-flag.ts";
 import { EmailStatusTool } from "./src/tools/email-status.ts";
+import { EmailProfileTool } from "./src/tools/email-profile.ts";
 
 export default function (pi: ExtensionAPI) {
   // Load saved config on startup
@@ -48,6 +50,7 @@ export default function (pi: ExtensionAPI) {
   // Register all tools
   pi.registerTool(EmailSetupTool);
   pi.registerTool(EmailStatusTool);
+  pi.registerTool(EmailProfileTool);
   pi.registerTool(EmailListMailboxesTool);
   pi.registerTool(EmailFetchTool);
   pi.registerTool(EmailReadTool);

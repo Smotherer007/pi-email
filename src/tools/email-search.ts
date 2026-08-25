@@ -8,6 +8,27 @@ import { resolveConfig } from "../config.ts";
 import { formatSearchResults } from "../formatting/formatters.ts";
 import type { SearchParams } from "../types.ts";
 
+/**
+ * Validate a YYYY-MM-DD date and return it as a Date.
+ *
+ * node-imap builds the SEARCH command synchronously inside its own callback,
+ * so an unparseable date threw an exception that no promise could catch and
+ * that terminated the host process. Rejecting it here keeps it a normal,
+ * explainable tool error.
+ */
+export function parseSearchDate(value: string, field: string): Date {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value.trim())) {
+    throw new Error(
+      `Invalid ${field} date "${value}". Use the format YYYY-MM-DD, e.g. 2026-01-31.`,
+    );
+  }
+  const parsed = new Date(`${value.trim()}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error(`Invalid ${field} date "${value}". No such calendar date.`);
+  }
+  return parsed;
+}
+
 export const EmailSearchTool = {
   name: "email_search",
   label: "Search Emails",
@@ -38,7 +59,7 @@ export const EmailSearchTool = {
   async execute(
     _toolCallId: string,
     params: SearchParams,
-    _signal: AbortSignal,
+    signal: AbortSignal,
   ) {
     const config = resolveConfig(params.profile);
     const mailbox = params.mailbox || "INBOX";
@@ -49,15 +70,15 @@ export const EmailSearchTool = {
     if (params.from) criteria.push(["FROM", params.from]);
     if (params.subject) criteria.push(["SUBJECT", params.subject]);
     if (params.body) criteria.push(["BODY", params.body]);
-    if (params.since) criteria.push(["SINCE", params.since]);
-    if (params.before) criteria.push(["BEFORE", params.before]);
+    if (params.since) criteria.push(["SINCE", parseSearchDate(params.since, "since")]);
+    if (params.before) criteria.push(["BEFORE", parseSearchDate(params.before, "before")]);
 
     const { headers, totalResults } = await searchEmails(
       config,
       mailbox,
       criteria,
       limit,
-      _signal,
+      signal,
     );
     const text = formatSearchResults(headers, totalResults);
 

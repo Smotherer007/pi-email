@@ -8,8 +8,9 @@
 
 import { Type } from "typebox";
 import { readEmail } from "../clients/imap-client.ts";
-import { sendEmail } from "../clients/smtp-client.ts";
+import { deliverEmail } from "../delivery.ts";
 import { resolveConfig } from "../config.ts";
+import { formatSentCopy } from "../formatting/formatters.ts";
 
 export const EmailForwardTool = {
   name: "email_forward",
@@ -80,15 +81,23 @@ export const EmailForwardTool = {
 
     const forwardBody = parts.join("\n");
 
-    const result = await sendEmail(config, {
-      to: params.to,
-      cc: params.cc,
-      bcc: params.bcc,
-      subject: `Fwd: ${parsed.subject || "(no subject)"}`,
-      body: forwardBody,
-    });
+    const originalSubject = parsed.subject || "(no subject)";
+    const { result, sentCopy } = await deliverEmail(
+      config,
+      {
+        to: params.to,
+        cc: params.cc,
+        bcc: params.bcc,
+        // Do not stack "Fwd: Fwd:" on an already-forwarded subject.
+        subject: /^(fwd|fw):/i.test(originalSubject.trim())
+          ? originalSubject
+          : `Fwd: ${originalSubject}`,
+        body: forwardBody,
+      },
+      signal,
+    );
 
-    const text = `Email forwarded successfully.\nTo: ${result.to}\nSubject: ${result.subject}\nMessage-ID: ${result.messageId}`;
+    const text = `Email forwarded successfully.\nTo: ${result.to}\nSubject: ${result.subject}\nMessage-ID: ${result.messageId}\n${formatSentCopy(sentCopy)}`;
 
     const attachmentCount = parsed.attachments?.length || 0;
 
@@ -100,6 +109,7 @@ export const EmailForwardTool = {
         subject: result.subject,
         messageId: result.messageId,
         attachmentCount,
+        sentCopy,
       },
     };
   },

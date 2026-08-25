@@ -11,7 +11,7 @@ export const EmailDeleteTool = {
   name: "email_delete",
   label: "Delete Email",
   description:
-    "Delete an email by UID. Marks as deleted and expunges immediately.",
+    "Delete an email by UID. Marks it as deleted and removes it permanently when the server supports UID EXPUNGE (RFC 4315); otherwise it stays flagged as deleted so no other message is affected. Consider email_move to a Trash folder instead, which is reversible.",
   parameters: Type.Object({
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
@@ -25,21 +25,20 @@ export const EmailDeleteTool = {
   async execute(
     _toolCallId: string,
     params: DeleteParams,
-    _signal: AbortSignal,
+    signal: AbortSignal,
   ) {
     const config = resolveConfig(params.profile);
     const mailbox = params.mailbox || "INBOX";
 
-    await deleteEmail(config, params.uid, mailbox);
+    const { expunged } = await deleteEmail(config, params.uid, mailbox, signal);
+
+    const text = expunged
+      ? `Email UID ${params.uid} permanently deleted from "${mailbox}".`
+      : `Email UID ${params.uid} marked as deleted in "${mailbox}". The server does not support UID EXPUNGE, so it was not expunged -- it disappears when the mailbox is next expunged by your mail client.`;
 
     return {
-      content: [
-        {
-          type: "text" as const,
-          text: `Email UID ${params.uid} deleted from "${mailbox}".`,
-        },
-      ],
-      details: { uid: params.uid, mailbox },
+      content: [{ type: "text" as const, text }],
+      details: { uid: params.uid, mailbox, expunged },
     };
   },
 };

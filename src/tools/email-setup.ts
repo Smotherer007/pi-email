@@ -2,7 +2,8 @@
  * email_setup tool -- Configure email account credentials.
  *
  * Stores a named profile. A profile is automatically set as active
- * if it's the first one. Use email_status to see all profiles.
+ * if it's the first one. Use email_status to see all profiles and
+ * email_profile to switch between them.
  */
 
 import { Type } from "typebox";
@@ -13,7 +14,7 @@ export const EmailSetupTool = {
   name: "email_setup",
   label: "Email Setup",
   description:
-    "Configure your email account credentials (IMAP/SMTP). Call this first before using any other email tools. After setup, credentials are stored in ~/.pi/email-config.json.",
+    "Configure your email account credentials (IMAP/SMTP). Call this first before using any other email tools. After setup, credentials are stored in ~/.pi/email-config.json (readable only by you).",
   parameters: Type.Object({
     name: Type.String({
       description: "Profile name, e.g. 'work', 'personal', 'gmail'. Use a short, memorable name.",
@@ -35,6 +36,12 @@ export const EmailSetupTool = {
     imapPassword: Type.String({
       description: "IMAP password or app-specific password",
     }),
+    imapRejectUnauthorized: Type.Optional(
+      Type.Boolean({
+        description:
+          "Whether to validate the IMAP server TLS certificate. Defaults to true. Set to false only for local bridges such as ProtonMail Bridge.",
+      }),
+    ),
     smtpHost: Type.String({
       description: "SMTP server hostname, e.g. smtp.gmail.com",
     }),
@@ -60,6 +67,18 @@ export const EmailSetupTool = {
     fromName: Type.Optional(
       Type.String({ description: "Display name for outgoing emails" }),
     ),
+    appendToSent: Type.Optional(
+      Type.Boolean({
+        description:
+          "Store a copy of outgoing mail in the Sent folder via IMAP. Defaults to true, except for Gmail, which does this server-side.",
+      }),
+    ),
+    sentMailbox: Type.Optional(
+      Type.String({
+        description:
+          "Explicit Sent mailbox name. Leave empty to auto-detect it from the server's folder list.",
+      }),
+    ),
   }),
 
   execute(_toolCallId: string, params: SetupParams, _signal: AbortSignal) {
@@ -70,6 +89,9 @@ export const EmailSetupTool = {
         tls: params.imapTls,
         user: params.imapUser,
         password: params.imapPassword,
+        ...(params.imapRejectUnauthorized !== undefined && {
+          rejectUnauthorized: params.imapRejectUnauthorized,
+        }),
       },
       smtp: {
         host: params.smtpHost,
@@ -82,6 +104,8 @@ export const EmailSetupTool = {
         })
       },
       fromName: params.fromName,
+      ...(params.appendToSent !== undefined && { appendToSent: params.appendToSent }),
+      ...(params.sentMailbox !== undefined && { sentMailbox: params.sentMailbox }),
     };
 
     saveProfile(params.name, config);

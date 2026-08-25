@@ -6,9 +6,27 @@
  */
 
 import { Type } from "typebox";
-import { connectImap } from "../clients/imap-client.ts";
-import type { EmailConfig } from "../types.ts";
+import { setFlags } from "../clients/imap-client.ts";
 import { resolveConfig } from "../config.ts";
+
+/** Convert friendly flag names to IMAP flag syntax */
+export function toImapFlag(flag: string): string {
+  // Already has backslash prefix => pass through
+  if (flag.startsWith("\\")) return flag;
+  // Common shorthands
+  const aliases: Record<string, string> = {
+    seen: "\\Seen",
+    read: "\\Seen",
+    unread: "\\Seen",
+    flagged: "\\Flagged",
+    starred: "\\Flagged",
+    answered: "\\Answered",
+    replied: "\\Answered",
+    draft: "\\Draft",
+    deleted: "\\Deleted",
+  };
+  return aliases[flag.toLowerCase()] || `\\${flag}`;
+}
 
 export const EmailFlagTool = {
   name: "email_flag",
@@ -72,99 +90,3 @@ export const EmailFlagTool = {
     };
   },
 };
-
-/** Convert friendly flag names to IMAP flag syntax */
-function toImapFlag(flag: string): string {
-  // Already has backslash prefix => pass through
-  if (flag.startsWith("\\")) return flag;
-  // Common shorthands
-  const aliases: Record<string, string> = {
-    seen: "\\Seen",
-    read: "\\Seen",
-    unread: "\\Seen",
-    flagged: "\\Flagged",
-    starred: "\\Flagged",
-    answered: "\\Answered",
-    replied: "\\Answered",
-    draft: "\\Draft",
-    deleted: "\\Deleted",
-  };
-  return aliases[flag.toLowerCase()] || `\\${flag}`;
-}
-
-function setFlags(
-  config: EmailConfig,
-  uid: number,
-  mailbox: string,
-  addFlags: string[],
-  removeFlags: string[],
-  signal?: AbortSignal,
-): Promise<void> {
-  return new Promise(async (resolve, reject) => {
-    const timeoutSignal = signal ?? AbortSignal.timeout(30_000);
-    let resolved = false;
-
-    if (timeoutSignal.aborted) {
-      return reject(new DOMException("Operation timed out", "TimeoutError"));
-    }
-    timeoutSignal.addEventListener("abort", () => {
-      if (!resolved) {
-        resolved = true;
-        reject(new DOMException("Operation timed out", "TimeoutError"));
-      }
-    }, { once: true });
-
-    const imap = await connectImap(config);
-
-    imap.openBox(mailbox, false, (err: Error) => {
-      if (err) {
-        if (!resolved) resolved = true;
-        imap.end();
-        return reject(err);
-      }
-
-      let pending = 0;
-      const done = () => {
-        if (--pending === 0) {
-          imap.end();
-          if (!resolved) {
-            resolved = true;
-            resolve();
-          }
-        }
-      };
-
-      if (addFlags.length > 0) {
-        pending++;
-        imap.addFlags(uid, addFlags, (err: Error) => {
-          if (err && !resolved) {
-            resolved = true;
-            imap.end();
-            return reject(err);
-          }
-          done();
-        });
-      }
-
-      if (removeFlags.length > 0) {
-        pending++;
-        imap.delFlags(uid, removeFlags, (err: Error) => {
-          if (err && !resolved) {
-            resolved = true;
-            imap.end();
-            return reject(err);
-          }
-          done();
-        });
-      }
-
-      if (pending === 0) {
-        imap.end();
-        if (!resolved) {
-          resolved = true;
-          resolve();
-        }
-      }
-    });
-  });
-}

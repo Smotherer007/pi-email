@@ -5,7 +5,13 @@
  * No emojis, no side effects.
  */
 
-import type { EmailBody, EmailHeader, MailboxInfo, SendResult } from "../types.ts";
+import type {
+  EmailBody,
+  EmailHeader,
+  MailboxInfo,
+  SendResult,
+  SentCopyStatus,
+} from "../types.ts";
 
 // Mailbox list
 
@@ -162,6 +168,18 @@ export function formatSendResult(result: SendResult): string {
     `To: ${result.to}`,
     `Subject: ${result.subject}`,
   ].join("\n");
+}
+
+/** One line describing what happened to the Sent-folder copy. */
+export function formatSentCopy(sentCopy: SentCopyStatus): string {
+  switch (sentCopy.status) {
+    case "saved":
+      return `Copy saved to "${sentCopy.mailbox}".`;
+    case "failed":
+      return `Warning: the message was sent but no copy could be stored in the Sent folder (${sentCopy.reason}).`;
+    default:
+      return `No Sent-folder copy stored (${sentCopy.reason}).`;
+  }
 }
 
 // Status

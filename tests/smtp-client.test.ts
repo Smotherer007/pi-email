@@ -46,9 +46,11 @@ describe("sendEmail", () => {
       attachmentPaths: ["/tmp/report.pdf", "notes.txt"],
     });
 
-    assert.strictEqual(mockSendMail.mock.callCount(), 1);
+    // sendEmail composes once (streamTransport) and then transmits the raw
+    // message once (real transport), so sendMail is called twice.
+    assert.strictEqual(mockSendMail.mock.callCount(), 2);
     const mailArg = mockSendMail.mock.calls[0].arguments[0];
-    assert.strictEqual(mailArg.from, '"Sender" <sender@example.com>');
+    assert.deepStrictEqual(mailArg.from, { name: "Sender", address: "sender@example.com" });
     assert.strictEqual(mailArg.to, "recipient@example.com");
     assert.strictEqual(mailArg.subject, "Hi");
     assert.strictEqual(mailArg.text, "Hello");

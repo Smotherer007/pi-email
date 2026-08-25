@@ -30,14 +30,40 @@ function configPath(): string {
 
 // Persistence
 
+/**
+ * Write the profile store.
+ *
+ * The file holds plaintext passwords, so it must never be group- or
+ * world-readable. writeFileSync's `mode` only applies when the file is
+ * created, so an existing file keeps its old (possibly 0644) permissions --
+ * we therefore write to a private temp file and rename it into place. That
+ * is also atomic, so a crash mid-write cannot truncate the config.
+ */
 function persistProfiles(): void {
   const filePath = configPath();
   const dir = path.dirname(filePath);
   if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
   }
+
   const data: EmailProfiles = { profiles, activeProfile };
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+  const tmpPath = `${filePath}.${process.pid}.tmp`;
+
+  try {
+    fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), {
+      encoding: "utf-8",
+      mode: 0o600,
+    });
+    fs.chmodSync(tmpPath, 0o600);
+    fs.renameSync(tmpPath, filePath);
+  } catch (err) {
+    try {
+      fs.unlinkSync(tmpPath);
+    } catch {
+      /* ignore */
+    }
+    throw err;
+  }
 }
 
 export function loadConfig(): void {
@@ -45,6 +71,15 @@ export function loadConfig(): void {
     const filePath = configPath();
     if (fs.existsSync(filePath)) {
       const raw = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+      // Tighten permissions on config files written by older versions,
+      // which created them with the default (world-readable) mode.
+      try {
+        const mode = fs.statSync(filePath).mode & 0o777;
+        if (mode !== 0o600) fs.chmodSync(filePath, 0o600);
+      } catch {
+        /* ignore */
+      }
 
       // Backward compatibility: if old flat format, migrate
       if (raw && typeof raw === "object" && raw.imap && !("profiles" in raw)) {

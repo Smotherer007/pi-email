@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 let EmailForwardTool: any;
 let mockReadEmail: any;
-let mockSendEmail: any;
+let mockDeliverEmail: any;
 
 function mockOriginalEmail(overrides: any = {}) {
   return {
@@ -25,18 +25,21 @@ let readEmailImpl = () => mockOriginalEmail();
 
 before(async () => {
   mockReadEmail = mock.fn(() => readEmailImpl());
-  mockSendEmail = mock.fn(() => ({
-    messageId: "<fwd-xyz@mail.test.com>",
-    to: "bob@example.com",
-    subject: "Fwd: Important Report",
+  mockDeliverEmail = mock.fn(() => ({
+    result: {
+      messageId: "<fwd-xyz@mail.test.com>",
+      to: "bob@example.com",
+      subject: "Fwd: Important Report",
+    },
+    sentCopy: { status: "saved", mailbox: "Sent" },
   }));
 
   mock.module("../src/clients/imap-client.ts", {
     exports: { readEmail: mockReadEmail },
   });
 
-  mock.module("../src/clients/smtp-client.ts", {
-    exports: { sendEmail: mockSendEmail },
+  mock.module("../src/delivery.ts", {
+    exports: { deliverEmail: mockDeliverEmail },
   });
 
   mock.module("../src/config.ts", {
@@ -59,7 +62,7 @@ describe("EmailForwardTool", () => {
 
   it("forwards to specified recipient", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     const result = await EmailForwardTool.execute(
       "call-1",
@@ -68,15 +71,15 @@ describe("EmailForwardTool", () => {
     );
     assert.ok(result.content[0].text.includes("Email forwarded successfully"));
 
-    assert.strictEqual(mockSendEmail.mock.callCount(), 1);
-    const call = mockSendEmail.mock.calls[0].arguments[1];
+    assert.strictEqual(mockDeliverEmail.mock.callCount(), 1);
+    const call = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.strictEqual(call.to, "bob@example.com");
     assert.strictEqual(call.subject, "Fwd: Important Report");
   });
 
   it("includes forwarding headers in body", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailForwardTool.execute(
       "call-1",
@@ -84,7 +87,7 @@ describe("EmailForwardTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.ok(callArgs.body.includes("---------- Forwarded message ----------"));
     assert.ok(callArgs.body.includes("From: Alice <alice@example.com>"));
     assert.ok(callArgs.body.includes("Subject: Important Report"));
@@ -94,7 +97,7 @@ describe("EmailForwardTool", () => {
 
   it("includes optional comment above forwarding headers", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailForwardTool.execute(
       "call-1",
@@ -102,7 +105,7 @@ describe("EmailForwardTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.ok(callArgs.body.includes("FYI, please take a look."));
     const commentPos = callArgs.body.indexOf("FYI, please take a look.");
     const fwdPos = callArgs.body.indexOf("---------- Forwarded message ----------");
@@ -111,7 +114,7 @@ describe("EmailForwardTool", () => {
 
   it("includes CC line when original had CC", async () => {
     readEmailImpl = () => mockOriginalEmail({ cc: { text: "Carol <carol@test.com>" } });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailForwardTool.execute(
       "call-1",
@@ -119,7 +122,7 @@ describe("EmailForwardTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.ok(callArgs.body.includes("CC: Carol <carol@test.com>"));
   });
 
@@ -131,7 +134,7 @@ describe("EmailForwardTool", () => {
           { filename: "image.png", contentType: "image/png" },
         ],
       });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailForwardTool.execute(
       "call-1",
@@ -139,7 +142,7 @@ describe("EmailForwardTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.ok(callArgs.body.includes("Attachments: report.pdf, image.png"));
   });
 
@@ -148,7 +151,7 @@ describe("EmailForwardTool", () => {
       mockOriginalEmail({
         attachments: [{ contentType: "application/octet-stream" }],
       });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailForwardTool.execute(
       "call-1",
@@ -156,13 +159,13 @@ describe("EmailForwardTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.ok(callArgs.body.includes("Attachments: unnamed"));
   });
 
   it("supports CC and BCC", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailForwardTool.execute(
       "call-1",
@@ -170,14 +173,14 @@ describe("EmailForwardTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.strictEqual(callArgs.cc, "eve@example.com");
     assert.strictEqual(callArgs.bcc, "boss@example.com");
   });
 
   it("handles missing subject gracefully", async () => {
     readEmailImpl = () => mockOriginalEmail({ subject: "" });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     const result = await EmailForwardTool.execute(
       "call-1",
@@ -189,7 +192,7 @@ describe("EmailForwardTool", () => {
 
   it("handles empty text body", async () => {
     readEmailImpl = () => mockOriginalEmail({ text: "" });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailForwardTool.execute(
       "call-1",
@@ -197,7 +200,7 @@ describe("EmailForwardTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.ok(callArgs.body.includes("(no text content)"));
   });
 
@@ -209,7 +212,7 @@ describe("EmailForwardTool", () => {
           { filename: "b.pdf" },
         ],
       });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     const result = await EmailForwardTool.execute(
       "call-1",

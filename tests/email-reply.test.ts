@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 
 let EmailReplyTool: any;
 let mockReadEmail: any;
-let mockSendEmail: any;
+let mockSetFlags: any;
+let mockDeliverEmail: any;
 
 function mockOriginalEmail(overrides: any = {}) {
   return {
@@ -25,18 +26,22 @@ let readEmailImpl = () => mockOriginalEmail();
 
 before(async () => {
   mockReadEmail = mock.fn(() => readEmailImpl());
-  mockSendEmail = mock.fn(() => ({
-    messageId: "<reply-xyz@mail.test.com>",
-    to: "alice@example.com",
-    subject: "Re: Hello World",
+  mockSetFlags = mock.fn(() => Promise.resolve(undefined));
+  mockDeliverEmail = mock.fn(() => ({
+    result: {
+      messageId: "<reply-xyz@mail.test.com>",
+      to: "alice@example.com",
+      subject: "Re: Hello World",
+    },
+    sentCopy: { status: "saved", mailbox: "Sent" },
   }));
 
   mock.module("../src/clients/imap-client.ts", {
-    exports: { readEmail: mockReadEmail },
+    exports: { readEmail: mockReadEmail, setFlags: mockSetFlags },
   });
 
-  mock.module("../src/clients/smtp-client.ts", {
-    exports: { sendEmail: mockSendEmail },
+  mock.module("../src/delivery.ts", {
+    exports: { deliverEmail: mockDeliverEmail },
   });
 
   mock.module("../src/config.ts", {
@@ -59,7 +64,7 @@ describe("EmailReplyTool", () => {
 
   it("replies to the original sender", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     const result = await EmailReplyTool.execute(
       "call-1",
@@ -68,14 +73,14 @@ describe("EmailReplyTool", () => {
     );
     assert.ok(result.content[0].text.includes("Reply sent successfully"));
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.strictEqual(callArgs.to, "alice@example.com");
     assert.strictEqual(callArgs.subject, "Re: Hello World");
   });
 
   it("includes In-Reply-To and References headers", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailReplyTool.execute(
       "call-1",
@@ -83,14 +88,14 @@ describe("EmailReplyTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
-    assert.strictEqual(callArgs.customHeaders.inReplyTo, "<abc123@mail.test.com>");
-    assert.strictEqual(callArgs.customHeaders.references, "<abc123@mail.test.com>");
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
+    assert.strictEqual(callArgs.inReplyTo, "<abc123@mail.test.com>");
+    assert.deepStrictEqual(callArgs.references, ["<abc123@mail.test.com>"]);
   });
 
   it("quotes the original message by default", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailReplyTool.execute(
       "call-1",
@@ -98,7 +103,7 @@ describe("EmailReplyTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.ok(callArgs.body.includes("My reply"));
     assert.ok(callArgs.body.includes("--- Original message ---"));
     assert.ok(callArgs.body.includes("From: Alice <alice@example.com>"));
@@ -107,7 +112,7 @@ describe("EmailReplyTool", () => {
 
   it("does not quote when quoteOriginal is false", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailReplyTool.execute(
       "call-1",
@@ -115,7 +120,7 @@ describe("EmailReplyTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.strictEqual(callArgs.body, "My reply");
     assert.ok(!callArgs.body.includes("--- Original message ---"));
   });
@@ -132,7 +137,7 @@ describe("EmailReplyTool", () => {
           value: [{ address: "carol@test.com" }],
         },
       });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailReplyTool.execute(
       "call-1",
@@ -140,7 +145,7 @@ describe("EmailReplyTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.ok(callArgs.cc.includes("bob@test.com"));
     assert.ok(callArgs.cc.includes("carol@test.com"));
   });
@@ -154,7 +159,7 @@ describe("EmailReplyTool", () => {
           value: [{ address: "alice@example.com" }, { address: "me@test.com" }],
         },
       });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailReplyTool.execute(
       "call-1",
@@ -162,13 +167,13 @@ describe("EmailReplyTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
-    assert.ok(!callArgs.cc.includes("alice@example.com"));
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
+    assert.ok(!callArgs.cc || !callArgs.cc.includes("alice@example.com"));
   });
 
   it("handles missing subject gracefully", async () => {
     readEmailImpl = () => mockOriginalEmail({ subject: "" });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     const result = await EmailReplyTool.execute(
       "call-1",
@@ -182,9 +187,9 @@ describe("EmailReplyTool", () => {
     readEmailImpl = () =>
       mockOriginalEmail({
         messageId: "<msg3@test.com>",
-        references: "<msg1@test.com> <msg2@test.com>",
+        references: ["<msg1@test.com>", "<msg2@test.com>"],
       });
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailReplyTool.execute(
       "call-1",
@@ -192,16 +197,17 @@ describe("EmailReplyTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
-    assert.strictEqual(
-      callArgs.customHeaders.references,
-      "<msg1@test.com> <msg2@test.com> <msg3@test.com>",
-    );
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
+    assert.deepStrictEqual(callArgs.references, [
+      "<msg1@test.com>",
+      "<msg2@test.com>",
+      "<msg3@test.com>",
+    ]);
   });
 
   it("sends HTML reply when provided", async () => {
     readEmailImpl = () => mockOriginalEmail();
-    mockSendEmail.mock.resetCalls();
+    mockDeliverEmail.mock.resetCalls();
 
     await EmailReplyTool.execute(
       "call-1",
@@ -209,7 +215,7 @@ describe("EmailReplyTool", () => {
       new AbortController().signal,
     );
 
-    const callArgs = mockSendEmail.mock.calls[0].arguments[1];
+    const callArgs = mockDeliverEmail.mock.calls[0].arguments[1];
     assert.strictEqual(callArgs.html, "<p>HTML reply</p>");
   });
 });

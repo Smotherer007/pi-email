@@ -28,6 +28,7 @@ Example configuration for Gmail (requires an [app-specific password](https://sup
 
 ```
 email_setup:
+  name: gmail
   imapHost: imap.gmail.com
   imapPort: 993
   imapTls: true
@@ -65,11 +66,12 @@ Use the email_setup tool to configure a an email account with the following deta
 |------|-------------|
 | `email_setup` | Configure IMAP/SMTP credentials. Must be called first. |
 | `email_status` | Show current connection status and configured account. |
+| `email_profile` | List, switch, or delete email profiles (multi-account support). |
 | `email_list_mailboxes` | List all available IMAP folders. |
 | `email_fetch` | Fetch email headers from a mailbox (from, subject, date, flags). |
 | `email_read` | Read the full body of a specific email by UID. Can save attachments. |
 | `email_search` | Search emails with IMAP criteria (from, subject, body, date range, unseen). |
-| `email_send` | Send an email via SMTP (plain text, HTML, CC, BCC, local file attachments). |
+| `email_send` | Send an email via SMTP (plain text, HTML, CC, BCC, local file attachments). Stores a copy in the Sent folder unless the provider does that itself. |
 | `email_reply` | Reply to an email. Auto-sets In-Reply-To/References headers for threading. Supports reply-all and quoting. |
 | `email_forward` | Forward an email to new recipients with inline forwarding headers. |
 | `email_flag` | Set or remove IMAP flags (Seen/Unseen, Flagged, Answered, etc.). |
@@ -140,27 +142,66 @@ email_send:
 
 ## Configuration
 
-Credentials are persisted to `~/.pi/email-config.json`. The `email_setup` tool writes this file automatically. You can also create it manually:
+Credentials are persisted to `~/.pi/email-config.json`. The `email_setup` tool writes this file automatically. The file stores named profiles plus an active-profile selector, so you can keep several accounts side by side. You can also create it manually:
 
 ```json
 {
-  "imap": {
-    "host": "imap.gmail.com",
-    "port": 993,
-    "tls": true,
-    "user": "you@gmail.com",
-    "password": "<app-password>"
+  "profiles": {
+    "default": {
+      "imap": {
+        "host": "imap.gmail.com",
+        "port": 993,
+        "tls": true,
+        "user": "you@gmail.com",
+        "password": "<app-password>"
+      },
+      "smtp": {
+        "host": "smtp.gmail.com",
+        "port": 587,
+        "secure": false,
+        "user": "you@gmail.com",
+        "password": "<app-password>"
+      },
+      "fromName": "Your Name"
+    }
   },
-  "smtp": {
-    "host": "smtp.gmail.com",
-    "port": 587,
-    "secure": false,
-    "user": "you@gmail.com",
-    "password": "<app-password>"
-  },
-  "fromName": "Your Name"
+  "activeProfile": "default"
 }
 ```
+
+### Multiple profiles
+
+Every account is stored under a profile name. The first profile is set active automatically; use `email_profile` to list, switch, or delete profiles.
+
+```yaml
+# Add a second account
+email_setup:
+  name: personal
+  imapHost: imap.gmail.com
+  # ...rest of the credentials...
+
+# List all profiles
+email_profile: {}
+
+# Switch the active profile
+email_profile:
+  action: use
+  name: personal
+
+# Delete a profile
+email_profile:
+  action: delete
+  name: personal
+```
+
+### Sent-folder copies
+
+Every outgoing message is also stored in the Sent folder via IMAP `APPEND`, so sent mail appears in other clients. Gmail already does this server-side, so the copy is skipped there to avoid duplicates. Optional `email_setup` fields:
+
+- `appendToSent: false` — disable the Sent-folder copy for a profile
+- `sentMailbox: "Sent Items"` — store in a specific mailbox instead of auto-detecting
+
+For local bridges with self-signed certificates, set `imapRejectUnauthorized: false` (or `smtpRejectUnauthorized: false`) in `email_setup`.
 
 ## Architecture
 
@@ -170,9 +211,11 @@ The extension follows data-oriented programming principles:
 - **`src/config.ts`** -- Configuration state management and file persistence.
 - **`src/clients/imap-client.ts`** -- IMAP operations. Each function opens a connection, performs work, and closes. Returns plain data.
 - **`src/clients/smtp-client.ts`** -- SMTP send operations via nodemailer.
+- **`src/delivery.ts`** -- Outgoing delivery: sends via SMTP, then stores a Sent-folder copy via IMAP APPEND (skipped for Gmail or when disabled).
 - **`src/formatting/formatters.ts`** -- Pure transformation functions that convert domain data into display strings. No side effects.
 - **`src/tools/email-setup.ts`** -- Account configuration (IMAP/SMTP credentials).
 - **`src/tools/email-status.ts`** -- Show configured profiles.
+- **`src/tools/email-profile.ts`** -- Manage profiles (list, switch, delete).
 - **`src/tools/email-list-mailboxes.ts`** -- List IMAP folders.
 - **`src/tools/email-fetch.ts`** -- Fetch email headers.
 - **`src/tools/email-read.ts`** -- Read full email body with PDF extraction.
@@ -184,11 +227,11 @@ The extension follows data-oriented programming principles:
 - **`src/tools/email-delete.ts`** -- Delete emails.
 - **`src/tools/email-move.ts`** -- Move emails between folders.
 - **`src/pdf-reader.ts`** -- PDF text extraction via pdftotext.
-- **`index.ts`** -- Extension entry point. Loads config, registers all 12 tools, and registers the `/inbox` command.
+- **`index.ts`** -- Extension entry point. Loads config, registers all 13 tools, and registers the `/inbox` command.
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 26+
 - pi coding agent (latest)
 - IMAP and SMTP access to your email provider
 
@@ -222,6 +265,7 @@ The package catalog auto-discovers packages with the `pi-package` keyword from n
 - [imap](https://www.npmjs.com/package/imap) -- IMAP client
 - [mailparser](https://www.npmjs.com/package/mailparser) -- Email parsing (RFC 2822, MIME)
 - [nodemailer](https://www.npmjs.com/package/nodemailer) -- SMTP client
+- [typebox](https://www.npmjs.com/package/typebox) -- Tool parameter schemas
 
 ## License
 

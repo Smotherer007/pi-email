@@ -2,26 +2,13 @@ import { describe, it, before, mock } from "node:test";
 import assert from "node:assert/strict";
 
 let EmailFlagTool: any;
-let mockOpenBox: any;
-let mockAddFlags: any;
-let mockDelFlags: any;
-let mockEnd: any;
+let mockSetFlags: any;
 
 before(async () => {
-  mockOpenBox = mock.fn((_box: any, _readonly: any, cb: any) => cb(null));
-  mockAddFlags = mock.fn((_uid: any, _flags: any, cb: any) => cb(null));
-  mockDelFlags = mock.fn((_uid: any, _flags: any, cb: any) => cb(null));
-  mockEnd = mock.fn();
+  mockSetFlags = mock.fn(() => Promise.resolve(undefined));
 
   mock.module("../src/clients/imap-client.ts", {
-    exports: {
-      connectImap: mock.fn(() => Promise.resolve({
-        openBox: mockOpenBox,
-        addFlags: mockAddFlags,
-        delFlags: mockDelFlags,
-        end: mockEnd,
-      })),
-    },
+    exports: { setFlags: mockSetFlags },
   });
 
   mock.module("../src/config.ts", {
@@ -42,16 +29,19 @@ describe("EmailFlagTool", () => {
   });
 
   it("returns message when no flags specified", async () => {
+    mockSetFlags.mock.resetCalls();
+
     const result = await EmailFlagTool.execute(
       "call-1",
       { uid: 42 },
       new AbortController().signal,
     );
     assert.ok(result.content[0].text.includes("No flags specified"));
+    assert.strictEqual(mockSetFlags.mock.callCount(), 0);
   });
 
   it("adds Seen flag to mark as read", async () => {
-    mockAddFlags.mock.resetCalls();
+    mockSetFlags.mock.resetCalls();
 
     const result = await EmailFlagTool.execute(
       "call-1",
@@ -61,14 +51,16 @@ describe("EmailFlagTool", () => {
     assert.ok(result.content[0].text.includes("flags updated"));
     assert.ok(result.content[0].text.includes("added: \\Seen"));
 
-    assert.strictEqual(mockAddFlags.mock.callCount(), 1);
-    const callArgs = mockAddFlags.mock.calls[0].arguments;
-    assert.strictEqual(callArgs[0], 42);
-    assert.deepStrictEqual(callArgs[1], ["\\Seen"]);
+    assert.strictEqual(mockSetFlags.mock.callCount(), 1);
+    const callArgs = mockSetFlags.mock.calls[0].arguments;
+    assert.strictEqual(callArgs[1], 42);
+    assert.strictEqual(callArgs[2], "INBOX");
+    assert.deepStrictEqual(callArgs[3], ["\\Seen"]);
+    assert.deepStrictEqual(callArgs[4], []);
   });
 
   it("removes Seen flag to mark as unread", async () => {
-    mockDelFlags.mock.resetCalls();
+    mockSetFlags.mock.resetCalls();
 
     const result = await EmailFlagTool.execute(
       "call-1",
@@ -77,13 +69,14 @@ describe("EmailFlagTool", () => {
     );
     assert.ok(result.content[0].text.includes("removed: \\Seen"));
 
-    const callArgs = mockDelFlags.mock.calls[0].arguments;
-    assert.strictEqual(callArgs[0], 42);
-    assert.deepStrictEqual(callArgs[1], ["\\Seen"]);
+    const callArgs = mockSetFlags.mock.calls[0].arguments;
+    assert.strictEqual(callArgs[1], 42);
+    assert.deepStrictEqual(callArgs[3], []);
+    assert.deepStrictEqual(callArgs[4], ["\\Seen"]);
   });
 
   it("adds Flagged flag", async () => {
-    mockAddFlags.mock.resetCalls();
+    mockSetFlags.mock.resetCalls();
 
     const result = await EmailFlagTool.execute(
       "call-1",
@@ -92,13 +85,12 @@ describe("EmailFlagTool", () => {
     );
     assert.ok(result.content[0].text.includes("added: \\Flagged"));
 
-    const callArgs = mockAddFlags.mock.calls[0].arguments;
-    assert.deepStrictEqual(callArgs[1], ["\\Flagged"]);
+    const callArgs = mockSetFlags.mock.calls[0].arguments;
+    assert.deepStrictEqual(callArgs[3], ["\\Flagged"]);
   });
 
   it("adds and removes flags simultaneously", async () => {
-    mockAddFlags.mock.resetCalls();
-    mockDelFlags.mock.resetCalls();
+    mockSetFlags.mock.resetCalls();
 
     await EmailFlagTool.execute(
       "call-1",
@@ -106,53 +98,53 @@ describe("EmailFlagTool", () => {
       new AbortController().signal,
     );
 
-    assert.strictEqual(mockAddFlags.mock.callCount(), 1);
-    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\Seen"]);
-    assert.strictEqual(mockDelFlags.mock.callCount(), 1);
-    assert.deepStrictEqual(mockDelFlags.mock.calls[0].arguments[1], ["\\Flagged"]);
+    assert.strictEqual(mockSetFlags.mock.callCount(), 1);
+    const callArgs = mockSetFlags.mock.calls[0].arguments;
+    assert.deepStrictEqual(callArgs[3], ["\\Seen"]);
+    assert.deepStrictEqual(callArgs[4], ["\\Flagged"]);
   });
 
   it("handles already-prefixed flags", async () => {
-    mockAddFlags.mock.resetCalls();
+    mockSetFlags.mock.resetCalls();
 
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["\\Seen"] },
       new AbortController().signal,
     );
-    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\Seen"]);
+    assert.deepStrictEqual(mockSetFlags.mock.calls[0].arguments[3], ["\\Seen"]);
   });
 
   it("handles 'read' alias for Seen", async () => {
-    mockAddFlags.mock.resetCalls();
+    mockSetFlags.mock.resetCalls();
 
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["read"] },
       new AbortController().signal,
     );
-    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\Seen"]);
+    assert.deepStrictEqual(mockSetFlags.mock.calls[0].arguments[3], ["\\Seen"]);
   });
 
   it("handles 'replied' alias for Answered", async () => {
-    mockAddFlags.mock.resetCalls();
+    mockSetFlags.mock.resetCalls();
 
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["replied"] },
       new AbortController().signal,
     );
-    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\Answered"]);
+    assert.deepStrictEqual(mockSetFlags.mock.calls[0].arguments[3], ["\\Answered"]);
   });
 
   it("passes through unknown flags with backslash prefix", async () => {
-    mockAddFlags.mock.resetCalls();
+    mockSetFlags.mock.resetCalls();
 
     await EmailFlagTool.execute(
       "call-1",
       { uid: 42, add: ["CustomFlag"] },
       new AbortController().signal,
     );
-    assert.deepStrictEqual(mockAddFlags.mock.calls[0].arguments[1], ["\\CustomFlag"]);
+    assert.deepStrictEqual(mockSetFlags.mock.calls[0].arguments[3], ["\\CustomFlag"]);
   });
 });

@@ -7,9 +7,62 @@
  */
 
 import { Type } from "typebox";
-import { readEmail } from "../clients/imap-client.ts";
-import { sendEmail } from "../clients/smtp-client.ts";
+import { readEmail, setFlags } from "../clients/imap-client.ts";
+import { deliverEmail } from "../delivery.ts";
 import { resolveConfig } from "../config.ts";
+import { formatSentCopy } from "../formatting/formatters.ts";
+
+/** Recipients of a reply, derived from the original message's headers. */
+export function buildReplyRecipients(
+  parsed: any,
+  ownAddress: string,
+  replyAll: boolean,
+): { to: string; cc: string } {
+  // Reply-To wins over From when present -- that is the whole point of the
+  // header, and mailing lists and no-reply senders rely on it.
+  const replyTo = parsed.replyTo?.value?.map((a: any) => a.address).filter(Boolean) || [];
+  const fromAddress = parsed.from?.value?.[0]?.address || "";
+  const to =
+    replyTo.length > 0
+      ? replyTo.join(", ")
+      : fromAddress || parsed.from?.text || "";
+
+  if (!replyAll) return { to, cc: "" };
+
+  const normalized = (value: string) => value.trim().toLowerCase();
+  const alreadyAddressed = new Set(
+    [...replyTo, fromAddress, ownAddress].filter(Boolean).map(normalized),
+  );
+
+  const toAddresses = parsed.to?.value?.map((a: any) => a.address).filter(Boolean) || [];
+  const ccAddresses = parsed.cc?.value?.map((a: any) => a.address).filter(Boolean) || [];
+
+  const cc: string[] = [];
+  for (const address of [...toAddresses, ...ccAddresses]) {
+    const key = normalized(address);
+    // Skips the sender, the Reply-To target, our own address (replying to all
+    // used to CC the sender back to themselves) and duplicates.
+    if (alreadyAddressed.has(key)) continue;
+    alreadyAddressed.add(key);
+    cc.push(address);
+  }
+
+  return { to, cc: cc.join(", ") };
+}
+
+/** Build the References chain for the reply. */
+export function buildReferences(
+  existing: string | ReadonlyArray<string> | undefined,
+  messageId: string,
+): string[] {
+  const chain = Array.isArray(existing)
+    ? [...existing]
+    : existing
+      ? [existing]
+      : [];
+  if (messageId && !chain.includes(messageId)) chain.push(messageId);
+  return chain;
+}
 
 export const EmailReplyTool = {
   name: "email_reply",
@@ -56,57 +109,63 @@ export const EmailReplyTool = {
     const { parsed } = await readEmail(config, params.uid, mailbox, null, signal);
 
     const messageId = (parsed as any).messageId || "";
-    const existingReferences = (parsed as any).references || "";
+    const references = buildReferences((parsed as any).references, messageId);
 
-    // Build quoted reply body
     const quotedBody = (params.quoteOriginal !== false) && parsed.text
       ? `${params.body}\n\n--- Original message ---\n> From: ${parsed.from?.text || ""}\n> Date: ${parsed.date?.toISOString() || ""}\n> Subject: ${parsed.subject || ""}\n>\n> ${parsed.text?.replace(/\n/g, "\n> ") || ""}`
       : params.body;
 
-    // Determine "To" recipient: reply to the sender
-    const to = parsed.from?.value?.[0]?.address || parsed.from?.text || "";
+    const { to, cc } = buildReplyRecipients(
+      parsed,
+      config.smtp.user,
+      params.replyAll === true,
+    );
 
-    // Determine CC for reply-all
-    let cc = "";
-    if (params.replyAll) {
-      const toAddr = parsed.to?.value?.map((a: any) => a.address).filter(Boolean) || [];
-      const ccAddr = parsed.cc?.value?.map((a: any) => a.address).filter(Boolean) || [];
-      const fromAddr = parsed.from?.value?.[0]?.address || "";
-      cc = [...toAddr, ...ccAddr]
-        .filter((a: string) => a !== fromAddr)
-        .join(", ");
-    }
-
-    // Build references chain for proper threading.
-    // If the original already has references, append our messageId.
-    // Otherwise start a new chain with just the original messageId.
-    const refs = existingReferences
-      ? `${existingReferences} ${messageId}`
-      : messageId;
-
-    const result = await sendEmail(config, {
-      to,
-      cc: cc || undefined,
-      subject: `Re: ${parsed.subject || "(no subject)"}`,
-      body: quotedBody,
-      html: params.html,
-      customHeaders: {
+    const subject = parsed.subject || "(no subject)";
+    const { result, sentCopy } = await deliverEmail(
+      config,
+      {
+        to,
+        cc: cc || undefined,
+        // Do not stack "Re: Re: Re:" on an already-prefixed subject.
+        subject: /^re:/i.test(subject.trim()) ? subject : `Re: ${subject}`,
+        body: quotedBody,
+        html: params.html,
         inReplyTo: messageId,
-        references: refs,
+        references,
       },
-    });
+      signal,
+    );
 
-    const text = `Reply sent successfully.\nTo: ${result.to}\nSubject: ${result.subject}\nMessage-ID: ${result.messageId}`;
-    if (cc) {
-      return {
-        content: [{ type: "text" as const, text: `${text}\nCC: ${cc}` }],
-        details: { originalUid: params.uid, to: result.to, cc, subject: result.subject, messageId: result.messageId },
-      };
+    // Marking the original as answered is a courtesy to every other mail
+    // client looking at this mailbox; failing at it must not fail the reply.
+    let answeredFlagSet = true;
+    try {
+      await setFlags(config, params.uid, mailbox, ["\\Answered"], [], signal);
+    } catch {
+      answeredFlagSet = false;
     }
+
+    const lines = [
+      "Reply sent successfully.",
+      `To: ${result.to}`,
+    ];
+    if (cc) lines.push(`CC: ${cc}`);
+    lines.push(`Subject: ${result.subject}`);
+    lines.push(`Message-ID: ${result.messageId}`);
+    lines.push(formatSentCopy(sentCopy));
 
     return {
-      content: [{ type: "text" as const, text }],
-      details: { originalUid: params.uid, to: result.to, subject: result.subject, messageId: result.messageId },
+      content: [{ type: "text" as const, text: lines.join("\n") }],
+      details: {
+        originalUid: params.uid,
+        to: result.to,
+        ...(cc ? { cc } : {}),
+        subject: result.subject,
+        messageId: result.messageId,
+        sentCopy,
+        answeredFlagSet,
+      },
     };
   },
 };

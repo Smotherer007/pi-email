@@ -25,12 +25,12 @@ export const EmailMoveTool = {
   async execute(
     _toolCallId: string,
     params: MoveParams,
-    _signal: AbortSignal,
+    signal: AbortSignal,
   ) {
     const config = resolveConfig(params.profile);
     const source = params.source || "INBOX";
 
-    await moveEmail(config, params.uid, source, params.destination);
+    await moveEmail(config, params.uid, source, params.destination, signal);
 
     return {
       content: [

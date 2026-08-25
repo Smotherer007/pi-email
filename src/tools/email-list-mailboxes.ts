@@ -7,7 +7,6 @@ import { listMailboxes } from "../clients/imap-client.ts";
 import { resolveConfig } from "../config.ts";
 import { formatMailboxList } from "../formatting/formatters.ts";
 
-
 export const EmailListMailboxesTool = {
   name: "email_list_mailboxes",
   label: "List Mailboxes",
@@ -18,9 +17,13 @@ export const EmailListMailboxesTool = {
     ),
   }),
 
-  async execute(_toolCallId: string, _params: { profile?: string }, _signal: AbortSignal) {
-    const config = resolveConfig(_params.profile);
-    const boxes = await listMailboxes(config);
+  async execute(
+    _toolCallId: string,
+    params: { profile?: string },
+    signal: AbortSignal,
+  ) {
+    const config = resolveConfig(params.profile);
+    const boxes = await listMailboxes(config, signal);
     const text = formatMailboxList(boxes);
 
     return {
