@@ -5,7 +5,7 @@
       "label": "index.ts",
       "type": "file",
       "sourceFile": "index.ts",
-      "centrality": 0.042,
+      "centrality": 0.041,
       "community": 20
     },
     {
@@ -13,7 +13,7 @@
       "label": "package.json",
       "type": "file",
       "sourceFile": "package.json",
-      "centrality": 0.054,
+      "centrality": 0.05,
       "community": 2
     },
     {
@@ -157,7 +157,7 @@
       "label": "src/clients/imap-client.ts",
       "type": "file",
       "sourceFile": "src/clients/imap-client.ts",
-      "centrality": 0.04,
+      "centrality": 0.039,
       "community": 22
     },
     {
@@ -166,7 +166,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L17",
-      "centrality": 0.013,
+      "centrality": 0.012,
       "community": 20
     },
     {
@@ -193,7 +193,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L93",
-      "centrality": 0.009,
+      "centrality": 0.008,
       "community": 22
     },
     {
@@ -211,7 +211,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L301",
-      "centrality": 0.009,
+      "centrality": 0.008,
       "community": 22
     },
     {
@@ -220,7 +220,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L402",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 22
     },
     {
@@ -229,7 +229,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L433",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 22
     },
     {
@@ -237,7 +237,7 @@
       "label": "src/clients/smtp-client.ts",
       "type": "file",
       "sourceFile": "src/clients/smtp-client.ts",
-      "centrality": 0.018,
+      "centrality": 0.017,
       "community": 20
     },
     {
@@ -255,7 +255,7 @@
       "type": "function",
       "sourceFile": "src/clients/smtp-client.ts",
       "sourceLocation": "L16",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 20
     },
     {
@@ -263,7 +263,7 @@
       "label": "src/config.ts",
       "type": "file",
       "sourceFile": "src/config.ts",
-      "centrality": 0.032,
+      "centrality": 0.03,
       "community": 22
     },
     {
@@ -281,7 +281,7 @@
       "type": "function",
       "sourceFile": "src/config.ts",
       "sourceLocation": "L33",
-      "centrality": 0.012,
+      "centrality": 0.011,
       "community": 22
     },
     {
@@ -299,7 +299,7 @@
       "type": "function",
       "sourceFile": "src/config.ts",
       "sourceLocation": "L81",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 22
     },
     {
@@ -308,7 +308,7 @@
       "type": "function",
       "sourceFile": "src/config.ts",
       "sourceLocation": "L86",
-      "centrality": 0.007,
+      "centrality": 0.006,
       "community": 22
     },
     {
@@ -317,7 +317,7 @@
       "type": "function",
       "sourceFile": "src/config.ts",
       "sourceLocation": "L95",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 22
     },
     {
@@ -326,7 +326,7 @@
       "type": "function",
       "sourceFile": "src/config.ts",
       "sourceLocation": "L103",
-      "centrality": 0.007,
+      "centrality": 0.006,
       "community": 22
     },
     {
@@ -353,7 +353,7 @@
       "type": "function",
       "sourceFile": "src/config.ts",
       "sourceLocation": "L126",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 22
     },
     {
@@ -362,7 +362,7 @@
       "type": "function",
       "sourceFile": "src/config.ts",
       "sourceLocation": "L135",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 22
     },
     {
@@ -371,7 +371,7 @@
       "type": "function",
       "sourceFile": "src/config.ts",
       "sourceLocation": "L145",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 22
     },
     {
@@ -388,7 +388,7 @@
       "label": "src/formatting/formatters.ts",
       "type": "file",
       "sourceFile": "src/formatting/formatters.ts",
-      "centrality": 0.032,
+      "centrality": 0.027,
       "community": 46
     },
     {
@@ -397,7 +397,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L12",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 46
     },
     {
@@ -406,7 +406,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L35",
-      "centrality": 0.004,
+      "centrality": 0.006,
       "community": 46
     },
     {
@@ -415,7 +415,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L66",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 46
     },
     {
@@ -424,7 +424,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L129",
-      "centrality": 0.004,
+      "centrality": 0.006,
       "community": 46
     },
     {
@@ -433,7 +433,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L158",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 46
     },
     {
@@ -442,7 +442,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L169",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 46
     },
     {
@@ -451,7 +451,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L173",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 46
     },
     {
@@ -460,7 +460,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L200",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 46
     },
     {
@@ -468,7 +468,7 @@
       "label": "src/pdf-reader.ts",
       "type": "file",
       "sourceFile": "src/pdf-reader.ts",
-      "centrality": 0.013,
+      "centrality": 0.012,
       "community": 55
     },
     {
@@ -495,7 +495,7 @@
       "type": "function",
       "sourceFile": "src/pdf-reader.ts",
       "sourceLocation": "L36",
-      "centrality": 0.007,
+      "centrality": 0.006,
       "community": 55
     },
     {
@@ -504,7 +504,7 @@
       "type": "function",
       "sourceFile": "src/pdf-reader.ts",
       "sourceLocation": "L61",
-      "centrality": 0.007,
+      "centrality": 0.006,
       "community": 55
     },
     {
@@ -512,7 +512,7 @@
       "label": "src/tools/email-delete.ts",
       "type": "file",
       "sourceFile": "src/tools/email-delete.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -520,7 +520,7 @@
       "label": "src/tools/email-fetch.ts",
       "type": "file",
       "sourceFile": "src/tools/email-fetch.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -528,7 +528,7 @@
       "label": "src/tools/email-flag.ts",
       "type": "file",
       "sourceFile": "src/tools/email-flag.ts",
-      "centrality": 0.01,
+      "centrality": 0.009,
       "community": 20
     },
     {
@@ -555,7 +555,7 @@
       "label": "src/tools/email-forward.ts",
       "type": "file",
       "sourceFile": "src/tools/email-forward.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -563,7 +563,7 @@
       "label": "src/tools/email-list-mailboxes.ts",
       "type": "file",
       "sourceFile": "src/tools/email-list-mailboxes.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -571,7 +571,7 @@
       "label": "src/tools/email-move.ts",
       "type": "file",
       "sourceFile": "src/tools/email-move.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -579,7 +579,7 @@
       "label": "src/tools/email-read.ts",
       "type": "file",
       "sourceFile": "src/tools/email-read.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -587,7 +587,7 @@
       "label": "src/tools/email-reply.ts",
       "type": "file",
       "sourceFile": "src/tools/email-reply.ts",
-      "centrality": 0.01,
+      "centrality": 0.009,
       "community": 20
     },
     {
@@ -595,7 +595,7 @@
       "label": "src/tools/email-search.ts",
       "type": "file",
       "sourceFile": "src/tools/email-search.ts",
-      "centrality": 0.007,
+      "centrality": 0.006,
       "community": 20
     },
     {
@@ -603,7 +603,7 @@
       "label": "src/tools/email-send.ts",
       "type": "file",
       "sourceFile": "src/tools/email-send.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -611,7 +611,7 @@
       "label": "src/tools/email-setup.ts",
       "type": "file",
       "sourceFile": "src/tools/email-setup.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -619,7 +619,7 @@
       "label": "src/tools/email-status.ts",
       "type": "file",
       "sourceFile": "src/tools/email-status.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -627,7 +627,7 @@
       "label": "src/types.ts",
       "type": "file",
       "sourceFile": "src/types.ts",
-      "centrality": 0.07,
+      "centrality": 0.065,
       "community": 20
     },
     {
@@ -726,7 +726,7 @@
       "type": "class",
       "sourceFile": "src/types.ts",
       "sourceLocation": "L90",
-      "centrality": 0.006,
+      "centrality": 0.005,
       "community": 20
     },
     {
@@ -735,7 +735,7 @@
       "type": "method",
       "sourceFile": "src/types.ts",
       "sourceLocation": "L91",
-      "centrality": 0.006,
+      "centrality": 0.005,
       "community": 20
     },
     {
@@ -950,7 +950,7 @@
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L221",
       "description": "* Decode a byte sequence using the charset named in an encoded-word. Falls back to UTF-8 for unknown labels.",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 22
     },
     {
@@ -979,7 +979,7 @@
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L291",
       "description": "Resolve a target path inside downloadDir, or throw if it would escape.",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 22
     },
     {
@@ -989,7 +989,7 @@
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L306",
       "description": "Never silently overwrite an existing file in the download directory.",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 22
     },
     {
@@ -1025,7 +1025,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L377",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 22
     },
     {
@@ -1044,7 +1044,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L425",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 22
     },
     {
@@ -1071,7 +1071,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L770",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 22
     },
     {
@@ -1080,7 +1080,7 @@
       "type": "function",
       "sourceFile": "src/clients/imap-client.ts",
       "sourceLocation": "L789",
-      "centrality": 0.008,
+      "centrality": 0.007,
       "community": 22
     },
     {
@@ -1108,7 +1108,7 @@
       "type": "function",
       "sourceFile": "src/clients/smtp-client.ts",
       "sourceLocation": "L37",
-      "centrality": 0.007,
+      "centrality": 0.006,
       "community": 20
     },
     {
@@ -1118,7 +1118,7 @@
       "sourceFile": "src/clients/smtp-client.ts",
       "sourceLocation": "L59",
       "description": "Reject header injection via CR/LF in address or subject fields.",
-      "centrality": 0.005,
+      "centrality": 0.004,
       "community": 20
     },
     {
@@ -1127,7 +1127,7 @@
       "type": "function",
       "sourceFile": "src/clients/smtp-client.ts",
       "sourceLocation": "L66",
-      "centrality": 0.009,
+      "centrality": 0.008,
       "community": 20
     },
     {
@@ -1135,7 +1135,7 @@
       "label": "src/delivery.ts",
       "type": "file",
       "sourceFile": "src/delivery.ts",
-      "centrality": 0.013,
+      "centrality": 0.012,
       "community": 22
     },
     {
@@ -1171,7 +1171,7 @@
       "type": "function",
       "sourceFile": "src/formatting/formatters.ts",
       "sourceLocation": "L174",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 46
     },
     {
@@ -1179,7 +1179,7 @@
       "label": "src/tools/email-profile.ts",
       "type": "file",
       "sourceFile": "src/tools/email-profile.ts",
-      "centrality": 0.004,
+      "centrality": 0.003,
       "community": 20
     },
     {
@@ -1224,7 +1224,7 @@
       "type": "class",
       "sourceFile": "src/types.ts",
       "sourceLocation": "L123",
-      "centrality": 0.006,
+      "centrality": 0.005,
       "community": 20
     },
     {
@@ -1233,7 +1233,7 @@
       "type": "method",
       "sourceFile": "src/types.ts",
       "sourceLocation": "L124",
-      "centrality": 0.006,
+      "centrality": 0.005,
       "community": 20
     },
     {
@@ -1242,7 +1242,7 @@
       "type": "class",
       "sourceFile": "src/types.ts",
       "sourceLocation": "L131",
-      "centrality": 0.006,
+      "centrality": 0.005,
       "community": 20
     },
     {
@@ -1251,7 +1251,7 @@
       "type": "method",
       "sourceFile": "src/types.ts",
       "sourceLocation": "L132",
-      "centrality": 0.006,
+      "centrality": 0.005,
       "community": 20
     },
     {
@@ -1278,6 +1278,105 @@
       "sourceFile": "tests/email-profile.test.ts",
       "centrality": 0,
       "community": 146
+    },
+    {
+      "id": "src_reply_file",
+      "label": "src/reply.ts",
+      "type": "file",
+      "sourceFile": "src/reply.ts",
+      "centrality": 0.009,
+      "community": 148
+    },
+    {
+      "id": "src_reply_buildReplyRecipients",
+      "label": "buildReplyRecipients",
+      "type": "function",
+      "sourceFile": "src/reply.ts",
+      "sourceLocation": "L10",
+      "centrality": 0.005,
+      "community": 148
+    },
+    {
+      "id": "src_reply_buildReferences",
+      "label": "buildReferences",
+      "type": "function",
+      "sourceFile": "src/reply.ts",
+      "sourceLocation": "L48",
+      "centrality": 0.005,
+      "community": 148
+    },
+    {
+      "id": "src_tools_email-draft-reply_file",
+      "label": "src/tools/email-draft-reply.ts",
+      "type": "file",
+      "sourceFile": "src/tools/email-draft-reply.ts",
+      "centrality": 0.011,
+      "community": 153
+    },
+    {
+      "id": "src_tools_email-draft-reply_sanitizeHeader",
+      "label": "sanitizeHeader",
+      "type": "function",
+      "sourceFile": "src/tools/email-draft-reply.ts",
+      "sourceLocation": "L16",
+      "description": "Strip CR/LF from a header value to prevent header injection.",
+      "centrality": 0.006,
+      "community": 151
+    },
+    {
+      "id": "src_tools_email-draft-reply_ensureReplySubject",
+      "label": "ensureReplySubject",
+      "type": "function",
+      "sourceFile": "src/tools/email-draft-reply.ts",
+      "sourceLocation": "L21",
+      "description": "Avoid stacking \"Re: Re: Re:\" on an already-prefixed subject.",
+      "centrality": 0.003,
+      "community": 153
+    },
+    {
+      "id": "src_tools_email-draft-reply_buildDraftEml",
+      "label": "buildDraftEml",
+      "type": "function",
+      "sourceFile": "src/tools/email-draft-reply.ts",
+      "sourceLocation": "L25",
+      "centrality": 0.006,
+      "community": 153
+    },
+    {
+      "id": "src_clients_imap-client_appendDraftMessage",
+      "label": "appendDraftMessage",
+      "type": "function",
+      "sourceFile": "src/clients/imap-client.ts",
+      "sourceLocation": "L828",
+      "centrality": 0.003,
+      "community": 22
+    },
+    {
+      "id": "src_formatting_formatters_flagMarkers",
+      "label": "flagMarkers",
+      "type": "function",
+      "sourceFile": "src/formatting/formatters.ts",
+      "sourceLocation": "L17",
+      "description": "Compose a \"[read,starred]\" style flag marker for a header row.",
+      "centrality": 0.008,
+      "community": 46
+    },
+    {
+      "id": "tests_email-draft-reply.test_file",
+      "label": "tests/email-draft-reply.test.ts",
+      "type": "file",
+      "sourceFile": "tests/email-draft-reply.test.ts",
+      "centrality": 0.001,
+      "community": 157
+    },
+    {
+      "id": "tests_email-draft-reply.test_mockOriginalEmail",
+      "label": "mockOriginalEmail",
+      "type": "function",
+      "sourceFile": "tests/email-draft-reply.test.ts",
+      "sourceLocation": "L8",
+      "centrality": 0.001,
+      "community": 157
     }
   ],
   "edges": [
@@ -2420,6 +2519,88 @@
     {
       "source": "tests_delivery.test_file",
       "target": "tests_delivery.test_baseConfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_reply_file",
+      "target": "src_reply_buildReplyRecipients",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_reply_file",
+      "target": "src_reply_buildReferences",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_tools_email-draft-reply_file",
+      "target": "src_tools_email-draft-reply_sanitizeHeader",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_tools_email-draft-reply_file",
+      "target": "src_tools_email-draft-reply_ensureReplySubject",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_tools_email-draft-reply_file",
+      "target": "src_tools_email-draft-reply_buildDraftEml",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_tools_email-draft-reply_buildDraftEml",
+      "target": "src_tools_email-draft-reply_sanitizeHeader",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "index_file",
+      "target": "src_tools_email-draft-reply_file",
+      "relation": "imports",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_file",
+      "target": "src_clients_imap-client_appendDraftMessage",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_clients_imap-client_appendDraftMessage",
+      "target": "src_clients_imap-client_runImap",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_formatting_formatters_file",
+      "target": "src_formatting_formatters_flagMarkers",
+      "relation": "contains",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "source": "src_formatting_formatters_formatHeaderList",
+      "target": "src_formatting_formatters_flagMarkers",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "src_formatting_formatters_formatSearchResults",
+      "target": "src_formatting_formatters_flagMarkers",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidenceScore": 0.85
+    },
+    {
+      "source": "tests_email-draft-reply.test_file",
+      "target": "tests_email-draft-reply.test_mockOriginalEmail",
       "relation": "contains",
       "confidence": "EXTRACTED"
     }
