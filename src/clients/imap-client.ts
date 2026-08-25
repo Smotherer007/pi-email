@@ -819,3 +819,30 @@ export function appendToSent(
     SHORT_TIMEOUT_MS,
   );
 }
+
+/**
+ * Append a raw RFC822 message to a drafts mailbox with the \Draft flag.
+ * Used by email_draft_reply to store a reply for manual review instead of
+ * sending it.
+ */
+export function appendDraftMessage(
+  config: EmailConfig,
+  draftMailbox: string,
+  raw: Buffer | string,
+  signal?: AbortSignal,
+): Promise<void> {
+  return runImap<void>(
+    config,
+    signal,
+    (imap, settle) => {
+      imap.append(
+        raw,
+        { mailbox: draftMailbox, flags: ["\\Draft"] },
+        settle.guard((err: Error) =>
+          err ? settle.reject(err) : settle.resolve(undefined),
+        ),
+      );
+    },
+    SHORT_TIMEOUT_MS,
+  );
+}

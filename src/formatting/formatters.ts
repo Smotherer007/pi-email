@@ -13,6 +13,15 @@ import type {
   SentCopyStatus,
 } from "../types.ts";
 
+/** Compose a "[read,starred]" style flag marker for a header row. */
+function flagMarkers(flags: ReadonlyArray<string>): string {
+  const markers: string[] = [];
+  if (flags.includes("\\Seen")) markers.push("read");
+  else markers.push("unread");
+  if (flags.includes("\\Flagged")) markers.push("starred");
+  return `[${markers.join(",")}]`;
+}
+
 // Mailbox list
 
 export function formatMailboxList(mailboxes: ReadonlyArray<MailboxInfo>): string {
@@ -53,7 +62,7 @@ export function formatHeaderList(
   ];
 
   for (const e of headers) {
-    const flag = e.flags.includes("\\Seen") ? "[read]" : "[unread]";
+    const flag = flagMarkers(e.flags);
     const subject = e.subject || "(no subject)";
     const from = e.from.split("<")[0].trim() || e.from;
     const date = e.date ? new Date(e.date).toLocaleString() : "unknown";
@@ -152,7 +161,7 @@ export function formatSearchResults(
     const shortSubject =
       subject.length > 70 ? subject.substring(0, 70) + "..." : subject;
     lines.push(
-      `[UID:${e.uid}] ${from} -- "${shortSubject}" (${date})`,
+      `${flagMarkers(e.flags)} [UID:${e.uid}] ${from} -- "${shortSubject}" (${date})`,
     );
   }
 

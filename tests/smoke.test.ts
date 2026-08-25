@@ -1,5 +1,5 @@
 /**
- * Smoke test — verifies all 12 tools have the correct shape
+ * Smoke test — verifies all 14 tools have the correct shape
  * and that the extension entry point registers them without errors.
  */
 import { describe, it } from "node:test";
@@ -7,12 +7,14 @@ import assert from "node:assert/strict";
 
 import { EmailSetupTool } from "../src/tools/email-setup.ts";
 import { EmailStatusTool } from "../src/tools/email-status.ts";
+import { EmailProfileTool } from "../src/tools/email-profile.ts";
 import { EmailListMailboxesTool } from "../src/tools/email-list-mailboxes.ts";
 import { EmailFetchTool } from "../src/tools/email-fetch.ts";
 import { EmailReadTool } from "../src/tools/email-read.ts";
 import { EmailSearchTool } from "../src/tools/email-search.ts";
 import { EmailSendTool } from "../src/tools/email-send.ts";
 import { EmailReplyTool } from "../src/tools/email-reply.ts";
+import { EmailDraftReplyTool } from "../src/tools/email-draft-reply.ts";
 import { EmailForwardTool } from "../src/tools/email-forward.ts";
 import { EmailDeleteTool } from "../src/tools/email-delete.ts";
 import { EmailMoveTool } from "../src/tools/email-move.ts";
@@ -21,12 +23,14 @@ import { EmailFlagTool } from "../src/tools/email-flag.ts";
 const allTools = [
   EmailSetupTool,
   EmailStatusTool,
+  EmailProfileTool,
   EmailListMailboxesTool,
   EmailFetchTool,
   EmailReadTool,
   EmailSearchTool,
   EmailSendTool,
   EmailReplyTool,
+  EmailDraftReplyTool,
   EmailForwardTool,
   EmailDeleteTool,
   EmailMoveTool,
@@ -34,8 +38,8 @@ const allTools = [
 ];
 
 describe("Tool structure smoke test", () => {
-  it("has exactly 12 tools", () => {
-    assert.strictEqual(allTools.length, 12);
+  it("has exactly 14 tools", () => {
+    assert.strictEqual(allTools.length, 14);
   });
 
   for (const tool of allTools) {

@@ -13,6 +13,7 @@
  *   - email_search: Search emails with IMAP criteria
  *   - email_send: Send an email via SMTP
  *   - email_reply: Reply to an email with threading headers
+ *   - email_draft_reply: Create a reply draft without sending
  *   - email_forward: Forward an email to new recipients
  *   - email_delete: Delete an email
  *   - email_move: Move an email to another mailbox
@@ -36,6 +37,7 @@ import { EmailReadTool } from "./src/tools/email-read.ts";
 import { EmailSearchTool } from "./src/tools/email-search.ts";
 import { EmailSendTool } from "./src/tools/email-send.ts";
 import { EmailReplyTool } from "./src/tools/email-reply.ts";
+import { EmailDraftReplyTool } from "./src/tools/email-draft-reply.ts";
 import { EmailForwardTool } from "./src/tools/email-forward.ts";
 import { EmailDeleteTool } from "./src/tools/email-delete.ts";
 import { EmailMoveTool } from "./src/tools/email-move.ts";
@@ -57,6 +59,7 @@ export default function (pi: ExtensionAPI) {
   pi.registerTool(EmailSearchTool);
   pi.registerTool(EmailSendTool);
   pi.registerTool(EmailReplyTool);
+  pi.registerTool(EmailDraftReplyTool);
   pi.registerTool(EmailForwardTool);
   pi.registerTool(EmailDeleteTool);
   pi.registerTool(EmailMoveTool);

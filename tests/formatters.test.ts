@@ -137,6 +137,23 @@ describe("formatHeaderList", () => {
     assert.ok(result.includes("[unread]"));
   });
 
+  it("marks starred emails with [starred]", () => {
+    const headers: EmailHeader[] = [
+      {
+        uid: 1,
+        from: "Alice <alice@example.com>",
+        to: "bob@example.com",
+        cc: "",
+        bcc: "",
+        subject: "Test",
+        date: "2025-01-01T00:00:00.000Z",
+        flags: ["\\Seen", "\\Flagged"],
+      },
+    ];
+    const result = formatHeaderList(headers, "INBOX", 1);
+    assert.ok(result.includes("[read,starred]"));
+  });
+
   it("shows (no subject) for empty subject", () => {
     const headers: EmailHeader[] = [
       {
@@ -396,6 +413,23 @@ describe("formatSearchResults", () => {
     assert.ok(result.includes("[UID:99]"));
     assert.ok(result.includes("Alice"));
     assert.ok(result.includes('"Hello"'));
+  });
+
+  it("shows flag markers in search results", () => {
+    const headers: EmailHeader[] = [
+      {
+        uid: 7,
+        from: "Alice <alice@example.com>",
+        to: "",
+        cc: "",
+        bcc: "",
+        subject: "Starred",
+        date: "2025-06-15T12:00:00.000Z",
+        flags: ["\\Seen", "\\Flagged"],
+      },
+    ];
+    const result = formatSearchResults(headers, 1);
+    assert.ok(result.includes("[read,starred]"));
   });
 
   it("shows (no subject) for empty subject in search", () => {

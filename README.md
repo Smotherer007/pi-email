@@ -73,6 +73,7 @@ Use the email_setup tool to configure a an email account with the following deta
 | `email_search` | Search emails with IMAP criteria (from, subject, body, date range, unseen). |
 | `email_send` | Send an email via SMTP (plain text, HTML, CC, BCC, local file attachments). Stores a copy in the Sent folder unless the provider does that itself. |
 | `email_reply` | Reply to an email. Auto-sets In-Reply-To/References headers for threading. Supports reply-all and quoting. |
+| `email_draft_reply` | Create a server-side reply draft (IMAP \Draft) for manual review instead of sending. |
 | `email_forward` | Forward an email to new recipients with inline forwarding headers. |
 | `email_flag` | Set or remove IMAP flags (Seen/Unseen, Flagged, Answered, etc.). |
 | `email_delete` | Delete an email by UID. |
@@ -87,6 +88,18 @@ email_reply:
   uid: 42
   body: "Thanks, got it!"
   # quoteOriginal: false   # disable quoting
+  # replyAll: true          # include all original recipients
+```
+
+### Draft replies
+
+`email_draft_reply` composes a reply but **never sends it** — it stores the reply as an IMAP `\Draft` in the Drafts folder (with `X-Unsent: 1`), so you can review and send it yourself from your mail client. It sets the same threading headers as `email_reply`.
+
+```yaml
+email_draft_reply:
+  uid: 42
+  body: "Thanks, got it!"
+  # draftMailbox: Drafts   # custom drafts folder
   # replyAll: true          # include all original recipients
 ```
 
@@ -212,6 +225,7 @@ The extension follows data-oriented programming principles:
 - **`src/clients/imap-client.ts`** -- IMAP operations. Each function opens a connection, performs work, and closes. Returns plain data.
 - **`src/clients/smtp-client.ts`** -- SMTP send operations via nodemailer.
 - **`src/delivery.ts`** -- Outgoing delivery: sends via SMTP, then stores a Sent-folder copy via IMAP APPEND (skipped for Gmail or when disabled).
+- **`src/reply.ts`** -- Pure reply helpers (recipient derivation, References chain) shared by `email_reply` and `email_draft_reply`.
 - **`src/formatting/formatters.ts`** -- Pure transformation functions that convert domain data into display strings. No side effects.
 - **`src/tools/email-setup.ts`** -- Account configuration (IMAP/SMTP credentials).
 - **`src/tools/email-status.ts`** -- Show configured profiles.
@@ -222,12 +236,13 @@ The extension follows data-oriented programming principles:
 - **`src/tools/email-search.ts`** -- Search emails with IMAP criteria.
 - **`src/tools/email-send.ts`** -- Send emails via SMTP.
 - **`src/tools/email-reply.ts`** -- Reply with threading headers and quoting.
+- **`src/tools/email-draft-reply.ts`** -- Create a server-side reply draft without sending.
 - **`src/tools/email-forward.ts`** -- Forward emails inline.
 - **`src/tools/email-flag.ts`** -- Set/remove IMAP flags.
 - **`src/tools/email-delete.ts`** -- Delete emails.
 - **`src/tools/email-move.ts`** -- Move emails between folders.
 - **`src/pdf-reader.ts`** -- PDF text extraction via pdftotext.
-- **`index.ts`** -- Extension entry point. Loads config, registers all 13 tools, and registers the `/inbox` command.
+- **`index.ts`** -- Extension entry point. Loads config, registers all 14 tools, and registers the `/inbox` command.
 
 ## Requirements
 
