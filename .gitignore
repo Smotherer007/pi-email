@@ -5,3 +5,4 @@ coverage/
 *.jpg
 .DS_Store
 graph-out/cache/
+graph-out/GRAPH_REPORT.md
