@@ -71,7 +71,7 @@ Use the email_setup tool to configure a an email account with the following deta
 | `email_fetch` | Fetch email headers from a mailbox (from, subject, date, flags). |
 | `email_read` | Read the full body of a specific email by UID. Can save attachments. |
 | `email_search` | Search emails with IMAP criteria (from, subject, body, date range, unseen). |
-| `email_send` | Send an email via SMTP (plain text, HTML, CC, BCC, local file attachments). Stores a copy in the Sent folder unless the provider does that itself. |
+| `email_send` | Send an email via SMTP (plain text, HTML, CC, BCC, local file attachments, optional custom sender). Stores a copy in the Sent folder unless the provider does that itself. |
 | `email_reply` | Reply to an email. Auto-sets In-Reply-To/References headers for threading. Supports reply-all and quoting. |
 | `email_draft_reply` | Create a server-side reply draft (IMAP \Draft) for manual review instead of sending. |
 | `email_forward` | Forward an email to new recipients with inline forwarding headers. |
@@ -145,6 +145,19 @@ email_send:
   body: Attached.
   attachmentPaths:
     - /path/to/report.pdf
+```
+
+### Sending from a different address
+
+`email_send` accepts optional `from` and `fromName` to send from a different address than the configured account (e.g. an alias). Whether the provider accepts it depends on your SMTP setup. Only the address is passed to nodemailer as a structured `{ name, address }` object, so quoting and RFC 2047 encoding happen automatically.
+
+```yaml
+email_send:
+  from: alias@example.com
+  fromName: Alias Name
+  to: recipient@example.com
+  subject: Report
+  body: Attached.
 ```
 
 ## Commands

@@ -184,6 +184,10 @@ export interface SearchParams {
 
 export interface SendParams {
   profile?: string;
+  /** Sender email address; overrides the configured account when the SMTP provider allows it. */
+  from?: string;
+  /** Sender display name; overrides the configured fromName. */
+  fromName?: string;
   to: string;
   subject: string;
   body: string;

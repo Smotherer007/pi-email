@@ -17,6 +17,14 @@ export const EmailSendTool = {
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
     ),
+    from: Type.Optional(
+      Type.String({
+        description: "Sender email address. Overrides the configured account when the SMTP provider permits it.",
+      }),
+    ),
+    fromName: Type.Optional(
+      Type.String({ description: "Sender display name. Overrides the configured fromName." }),
+    ),
     to: Type.String({
       description: "Recipient email address(es), comma-separated",
     }),

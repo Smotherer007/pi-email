@@ -71,6 +71,8 @@ function buildMailOptions(
     assertSafeAttachment(attachmentPath);
   }
 
+  assertSingleLine(params.from, "from");
+  assertSingleLine(params.fromName, "fromName");
   assertSingleLine(params.to, "to");
   assertSingleLine(params.cc, "cc");
   assertSingleLine(params.bcc, "bcc");
@@ -79,7 +81,10 @@ function buildMailOptions(
   const mailOptions: Record<string, unknown> = {
     // Object form so nodemailer does the quoting and RFC 2047 encoding.
     // The old template string broke on display names containing a quote.
-    from: { name: config.fromName || config.smtp.user, address: config.smtp.user },
+    from: {
+      name: params.fromName || config.fromName || config.smtp.user,
+      address: params.from || config.smtp.user,
+    },
     to: params.to,
     subject: params.subject,
     text: params.body,

@@ -74,6 +74,65 @@ describe("sendEmail", () => {
     assert.strictEqual(mailArg.attachments, undefined);
   });
 
+  it("overrides the sender with explicit from/fromName", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await sendEmail(config, {
+      from: "alias@example.com",
+      fromName: "Alias Name",
+      to: "recipient@example.com",
+      subject: "Hi",
+      body: "Hello",
+    });
+
+    const mailArg = mockSendMail.mock.calls[0].arguments[0];
+    assert.deepStrictEqual(mailArg.from, {
+      name: "Alias Name",
+      address: "alias@example.com",
+    });
+  });
+
+  it("falls back to the configured account when from is omitted", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await sendEmail(config, {
+      to: "recipient@example.com",
+      subject: "Hi",
+      body: "Hello",
+    });
+
+    const mailArg = mockSendMail.mock.calls[0].arguments[0];
+    assert.deepStrictEqual(mailArg.from, { name: "Sender", address: "sender@example.com" });
+  });
+
+  it("rejects CR/LF in from and fromName", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await assert.rejects(
+      () =>
+        sendEmail(config, {
+          from: "alias@example.com\r\nX-Injected: yes",
+          to: "recipient@example.com",
+          subject: "Hi",
+          body: "Hello",
+        }),
+      /Line breaks are not allowed in the from field/,
+    );
+
+    await assert.rejects(
+      () =>
+        sendEmail(config, {
+          fromName: "Alias\r\nInjected",
+          to: "recipient@example.com",
+          subject: "Hi",
+          body: "Hello",
+        }),
+      /Line breaks are not allowed in the fromName field/,
+    );
+
+    assert.strictEqual(mockSendMail.mock.callCount(), 0);
+  });
+
   it("rejects URL and data URI attachments", async () => {
     mockSendMail.mock.resetCalls();
 
