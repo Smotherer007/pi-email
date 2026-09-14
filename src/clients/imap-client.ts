@@ -17,22 +17,37 @@ import { EmailNotFoundError, UnsafeAttachmentPathError } from "../types.ts";
 const DEFAULT_TIMEOUT_MS = 60_000;
 const SHORT_TIMEOUT_MS = 30_000;
 
+/**
+ * RFC 2971 `ID`: implemented by node-imap, but absent from `@types/imap`, so
+ * the one call site widens the connection instead of the whole module.
+ */
+interface ImapIdCommand {
+  id(
+    info: Record<string, string>,
+    callback: (err: Error | null) => void,
+  ): void;
+}
+
 // Connection
 
 let cachedVersion: string | undefined;
 
 function getClientVersion(): string {
-  if (!cachedVersion) {
-    try {
-      const pkg = JSON.parse(
-        fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
-      );
-      cachedVersion = typeof pkg.version === "string" ? pkg.version : "unknown";
-    } catch {
-      cachedVersion = "unknown";
-    }
+  if (cachedVersion) return cachedVersion;
+
+  let version = "unknown";
+  try {
+    const pkg = JSON.parse(
+      fs.readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+    );
+    if (typeof pkg.version === "string") version = pkg.version;
+  } catch {
+    // Unreadable or malformed package.json: report the fallback rather than
+    // failing the whole connection over a cosmetic IMAP ID string.
   }
-  return cachedVersion;
+
+  cachedVersion = version;
+  return version;
 }
 
 export function connectImap(config: EmailConfig): Promise<Imap> {
@@ -77,7 +92,10 @@ export function connectImap(config: EmailConfig): Promise<Imap> {
       };
       try {
         if (imap.serverSupports("ID")) {
-          imap.id({ name: "pi-email", version: getClientVersion() }, done);
+          (imap as Imap & ImapIdCommand).id(
+            { name: "pi-email", version: getClientVersion() },
+            done,
+          );
         } else {
           done();
         }

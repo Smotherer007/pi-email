@@ -81,7 +81,7 @@ export const EmailSetupTool = {
     ),
   }),
 
-  execute(_toolCallId: string, params: SetupParams, _signal: AbortSignal) {
+  async execute(_toolCallId: string, params: SetupParams, _signal: AbortSignal) {
     const config: EmailConfig = {
       imap: {
         host: params.imapHost,

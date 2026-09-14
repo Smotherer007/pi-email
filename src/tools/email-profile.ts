@@ -7,6 +7,7 @@
  */
 
 import { Type } from "typebox";
+import type { AgentToolResult } from "@earendil-works/pi-coding-agent";
 import {
   deleteProfile,
   getActiveProfile,
@@ -14,6 +15,16 @@ import {
   setActiveProfile,
 } from "../config.ts";
 import { formatProfileStatus } from "../formatting/formatters.ts";
+
+/**
+ * Details returned per action. Named as a union so `execute` has one declared
+ * return type; without it the SDK infers the details shape from the first
+ * branch and rejects the other two.
+ */
+type ProfileDetails =
+  | { profiles: string[]; activeProfile: string | null }
+  | { activeProfile: string }
+  | { deleted: boolean; activeProfile: string | null };
 
 export const EmailProfileTool = {
   name: "email_profile",
@@ -31,11 +42,11 @@ export const EmailProfileTool = {
     ),
   }),
 
-  execute(
+  async execute(
     _toolCallId: string,
     params: { action?: string; name?: string },
     _signal: AbortSignal,
-  ) {
+  ): Promise<AgentToolResult<ProfileDetails>> {
     const action = (params.action || "list").toLowerCase();
 
     if (action === "list") {

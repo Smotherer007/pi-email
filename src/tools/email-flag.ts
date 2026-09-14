@@ -74,7 +74,9 @@ export const EmailFlagTool = {
     if (addFlags.length === 0 && removeFlags.length === 0) {
       return {
         content: [{ type: "text" as const, text: "No flags specified. Use 'add' and/or 'remove' to change flags." }],
-        details: { uid: params.uid, mailbox },
+        // Same keys as the success branch: a differing details shape made the
+        // tool definition fail to unify with the SDK's ToolDefinition type.
+        details: { uid: params.uid, mailbox, added: [], removed: [] },
       };
     }
 

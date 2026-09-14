@@ -1,3 +1,4 @@
 .github/
 .gitignore
 graph-out/
+sentinel.config.ts

@@ -1,5 +1,7 @@
 import { describe, it, before, mock } from "node:test";
 import assert from "node:assert/strict";
+import * as os from "node:os";
+import * as path from "node:path";
 import type { EmailConfig } from "../src/types.ts";
 
 let sendEmail: any;
@@ -29,7 +31,7 @@ before(async () => {
   mockCreateTransport = mock.fn(() => ({ sendMail: mockSendMail }));
 
   mock.module("nodemailer", {
-    exports: { default: { createTransport: mockCreateTransport } },
+    defaultExport: { createTransport: mockCreateTransport },
   });
 
   ({ sendEmail } = await import("../src/clients/smtp-client.ts"));
@@ -159,5 +161,121 @@ describe("sendEmail", () => {
     );
 
     assert.strictEqual(mockSendMail.mock.callCount(), 0);
+  });
+});
+
+describe("sendEmail attachment allowlist", () => {
+  const homedir = os.homedir();
+
+  /** Run with PI_EMAIL_ATTACH_ROOTS set, restoring the previous value after. */
+  async function withRoots(value: string, run: () => Promise<void>) {
+    const previous = process.env.PI_EMAIL_ATTACH_ROOTS;
+    process.env.PI_EMAIL_ATTACH_ROOTS = value;
+    try {
+      await run();
+    } finally {
+      if (previous === undefined) delete process.env.PI_EMAIL_ATTACH_ROOTS;
+      else process.env.PI_EMAIL_ATTACH_ROOTS = previous;
+    }
+  }
+
+  it("allows a relative path inside the working directory", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await sendEmail(config, {
+      to: "recipient@example.com",
+      subject: "Hi",
+      body: "Hello",
+      attachmentPaths: ["notes.txt"],
+    });
+
+    assert.deepStrictEqual(mockSendMail.mock.calls[0].arguments[0].attachments, [
+      { path: "notes.txt" },
+    ]);
+  });
+
+  it("allows a file in the temp directory", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await sendEmail(config, {
+      to: "recipient@example.com",
+      subject: "Hi",
+      body: "Hello",
+      attachmentPaths: [path.join(os.tmpdir(), "report.pdf")],
+    });
+
+    assert.strictEqual(mockSendMail.mock.callCount(), 2);
+  });
+
+  // The point of the allowlist: mail that talks the agent into attaching a
+  // credential file must not succeed.
+  it("rejects a file outside the allowed directories", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await assert.rejects(
+      () =>
+        sendEmail(config, {
+          to: "recipient@example.com",
+          subject: "Hi",
+          body: "Hello",
+          attachmentPaths: [path.join(homedir, ".ssh", "id_rsa")],
+        }),
+      /outside the allowed directories/,
+    );
+
+    assert.strictEqual(mockSendMail.mock.callCount(), 0);
+  });
+
+  it("rejects the pi configuration directory", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await assert.rejects(
+      () =>
+        sendEmail(config, {
+          to: "recipient@example.com",
+          subject: "Hi",
+          body: "Hello",
+          attachmentPaths: [path.join(homedir, ".pi", "email-config.json")],
+        }),
+      /pi configuration directory/,
+    );
+
+    assert.strictEqual(mockSendMail.mock.callCount(), 0);
+  });
+
+  it("rejects the pi configuration directory even when a root covers it", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await withRoots(homedir, async () => {
+      await assert.rejects(
+        () =>
+          sendEmail(config, {
+            to: "recipient@example.com",
+            subject: "Hi",
+            body: "Hello",
+            attachmentPaths: [path.join(homedir, ".pi", "email-config.json")],
+          }),
+        /pi configuration directory/,
+      );
+    });
+
+    assert.strictEqual(mockSendMail.mock.callCount(), 0);
+  });
+
+  it("allows a file under a root from PI_EMAIL_ATTACH_ROOTS", async () => {
+    mockSendMail.mock.resetCalls();
+
+    await withRoots(homedir, async () => {
+      await sendEmail(config, {
+        to: "recipient@example.com",
+        subject: "Hi",
+        body: "Hello",
+        attachmentPaths: [path.join(homedir, "Documents", "notes.txt")],
+      });
+    });
+
+    assert.deepStrictEqual(mockSendMail.mock.calls[0].arguments[0].attachments, [
+      { path: path.join(homedir, "Documents", "notes.txt") },
+    ]);
   });
 });

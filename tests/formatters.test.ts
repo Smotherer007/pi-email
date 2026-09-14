@@ -1,6 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
+  addressText,
+  UNTRUSTED_NOTICE,
   formatMailboxList,
   formatHeaderList,
   formatEmailBody,
@@ -367,6 +369,50 @@ describe("formatEmailBody", () => {
       assert.ok(!result.includes("--- PDF:"));
     });
   });
+
+  // The body and any extracted PDF text are sender-controlled. The marker is a
+  // framing device for the model, so its position relative to the content it
+  // frames is the part worth testing.
+  describe("untrusted framing", () => {
+    it("marks the body, after our own headers", () => {
+      const result = formatEmailBody(baseEmail, []);
+      assert.ok(result.includes(UNTRUSTED_NOTICE));
+      assert.ok(result.indexOf("Subject:") < result.indexOf(UNTRUSTED_NOTICE));
+      assert.ok(result.indexOf(UNTRUSTED_NOTICE) < result.indexOf(baseEmail.text));
+    });
+
+    it("emits the marker exactly once for a plain body", () => {
+      const result = formatEmailBody(baseEmail, []);
+      assert.strictEqual(result.split(UNTRUSTED_NOTICE).length - 1, 1);
+    });
+
+    it("sits ahead of the first PDF section", () => {
+      const email = {
+        ...baseEmail,
+        pdfTexts: [{ filename: "invoice.pdf", text: "Total: 100 EUR" }],
+      };
+      const result = formatEmailBody(email, []);
+      assert.ok(
+        result.indexOf(UNTRUSTED_NOTICE) < result.indexOf("--- PDF: invoice.pdf ---"),
+      );
+      assert.strictEqual(result.split(UNTRUSTED_NOTICE).length - 1, 1);
+    });
+
+    it("places the marker ahead of every PDF", () => {
+      const email = {
+        ...baseEmail,
+        pdfTexts: [
+          { filename: "a.pdf", text: "Content A" },
+          { filename: "b.pdf", text: "Content B" },
+        ],
+      };
+      const result = formatEmailBody(email, []);
+      assert.strictEqual(result.split(UNTRUSTED_NOTICE).length - 1, 1);
+      assert.ok(
+        result.indexOf(UNTRUSTED_NOTICE) < result.indexOf("--- PDF: b.pdf ---"),
+      );
+    });
+  });
 });
 
 // formatSearchResults
@@ -524,5 +570,37 @@ describe("formatConfiguredStatus", () => {
       "John Doe",
     );
     assert.ok(result.includes("From name: John Doe"));
+  });
+});
+
+describe("addressText", () => {
+  it("renders a single address object", () => {
+    assert.strictEqual(
+      addressText({ text: "Jane <jane@example.com>" } as never),
+      "Jane <jane@example.com>",
+    );
+  });
+
+  // mailparser returns a bare object for one address and an array for several.
+  // The array case is the common one and used to render as an empty string.
+  it("joins several addresses", () => {
+    assert.strictEqual(
+      addressText([
+        { text: "Jane <jane@example.com>" },
+        { text: "Bob <bob@example.com>" },
+      ] as never),
+      "Jane <jane@example.com>, Bob <bob@example.com>",
+    );
+  });
+
+  it("returns an empty string for a missing header", () => {
+    assert.strictEqual(addressText(undefined), "");
+  });
+
+  it("skips entries without text", () => {
+    assert.strictEqual(
+      addressText([{ text: "" }, { text: "bob@example.com" }] as never),
+      "bob@example.com",
+    );
   });
 });

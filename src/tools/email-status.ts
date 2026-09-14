@@ -15,7 +15,7 @@ export const EmailStatusTool = {
     "Show current email configuration status (which account is configured).",
   parameters: Type.Object({}),
 
-  execute(_toolCallId: string, _params: {}, _signal: AbortSignal) {
+  async execute(_toolCallId: string, _params: {}, _signal: AbortSignal) {
     const allProfiles = getProfiles();
     const active = getActiveProfile();
     const text = formatProfileStatus(allProfiles, active);

@@ -10,7 +10,7 @@ import { Type } from "typebox";
 import { readEmail } from "../clients/imap-client.ts";
 import { deliverEmail } from "../delivery.ts";
 import { resolveConfig } from "../config.ts";
-import { formatSentCopy } from "../formatting/formatters.ts";
+import { addressText, formatSentCopy } from "../formatting/formatters.ts";
 
 export const EmailForwardTool = {
   name: "email_forward",
@@ -64,9 +64,10 @@ export const EmailForwardTool = {
     parts.push(`From: ${parsed.from?.text || ""}`);
     parts.push(`Date: ${parsed.date?.toISOString() || ""}`);
     parts.push(`Subject: ${parsed.subject || ""}`);
-    parts.push(`To: ${parsed.to?.text || ""}`);
-    if (parsed.cc?.text) {
-      parts.push(`CC: ${parsed.cc.text}`);
+    parts.push(`To: ${addressText(parsed.to)}`);
+    const ccLine = addressText(parsed.cc);
+    if (ccLine) {
+      parts.push(`CC: ${ccLine}`);
     }
 
     if (parsed.attachments?.length) {

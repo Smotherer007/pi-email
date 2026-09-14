@@ -6,3 +6,7 @@ coverage/
 .DS_Store
 graph-out/cache/
 graph-out/GRAPH_REPORT.md
+
+# Local sentinel configuration (pi-sentinel). Tooling config, not project config:
+# every checkout gets its own, and the defaults are sane without it.
+sentinel.config.ts

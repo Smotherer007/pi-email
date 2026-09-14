@@ -35,15 +35,15 @@ before(async () => {
   }));
 
   mock.module("../src/clients/imap-client.ts", {
-    exports: { readEmail: mockReadEmail },
+    namedExports: { readEmail: mockReadEmail },
   });
 
   mock.module("../src/delivery.ts", {
-    exports: { deliverEmail: mockDeliverEmail },
+    namedExports: { deliverEmail: mockDeliverEmail },
   });
 
   mock.module("../src/config.ts", {
-    exports: {
+    namedExports: {
       resolveConfig: mock.fn(() => ({
         imap: { host: "imap.test.com", port: 993, tls: true, user: "me@test.com", password: "pw" },
         smtp: { host: "smtp.test.com", port: 587, secure: false, user: "me@test.com", password: "pw" },

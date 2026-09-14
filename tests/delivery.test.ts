@@ -29,10 +29,10 @@ before(async () => {
   mockAppendToSent = mock.fn(() => Promise.resolve("Sent"));
 
   mock.module("../src/clients/smtp-client.ts", {
-    exports: { sendEmail: mockSendEmail },
+    namedExports: { sendEmail: mockSendEmail },
   });
   mock.module("../src/clients/imap-client.ts", {
-    exports: { appendToSent: mockAppendToSent },
+    namedExports: { appendToSent: mockAppendToSent },
   });
 
   ({ deliverEmail, savesSentCopyServerSide } = await import("../src/delivery.ts"));

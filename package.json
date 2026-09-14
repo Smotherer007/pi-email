@@ -26,12 +26,13 @@
     "build": "echo 'No build step defined'",
     "test": "node --experimental-test-module-mocks --experimental-test-coverage --test 'tests/**/*.test.ts'",
     "test:watch": "node --experimental-test-module-mocks --test --watch 'tests/**/*.test.ts'",
-    "test:coverage": "node --experimental-test-module-mocks --experimental-test-coverage --test 'tests/**/*.test.ts'"
+    "test:coverage": "node --experimental-test-module-mocks --experimental-test-coverage --test 'tests/**/*.test.ts'",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "imap": "^0.8.17",
-    "mailparser": "^3.7.2",
-    "nodemailer": "^9.0.3",
+    "mailparser": "^3.9.26",
+    "nodemailer": "^10.0.10",
     "typebox": "^1.2.8"
   },
   "overrides": {
@@ -43,9 +44,13 @@
     "access": "public"
   },
   "devDependencies": {
+    "@earendil-works/pi-coding-agent": "0.85.1",
     "@semantic-release/git": "^10.0.0",
-    "@types/nodemailer": "^8.0.0",
-    "semantic-release": "^25.0.0"
+    "@types/imap": "^0.8.43",
+    "@types/mailparser": "^3.4.6",
+    "@types/node": "^26.5.1",
+    "semantic-release": "^25.0.0",
+    "typescript": "7.0.2"
   },
   "pi": {
     "extensions": [

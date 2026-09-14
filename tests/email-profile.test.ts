@@ -24,7 +24,7 @@ before(async () => {
   mockDeleteProfile = mock.fn(() => true);
 
   mock.module("../src/config.ts", {
-    exports: {
+    namedExports: {
       getProfiles: mockGetProfiles,
       getActiveProfile: mockGetActiveProfile,
       setActiveProfile: mockSetActiveProfile,
@@ -87,25 +87,24 @@ describe("EmailProfileTool", () => {
     assert.strictEqual(result.details.deleted, true);
   });
 
-  it("requires a name for use and delete", () => {
-    assert.throws(
-      () => EmailProfileTool.execute("call-1", { action: "use" }, new AbortController().signal),
+  it("requires a name for use and delete", async () => {
+    await assert.rejects(
+      EmailProfileTool.execute("call-1", { action: "use" }, new AbortController().signal),
       /requires a profile name/,
     );
-    assert.throws(
-      () => EmailProfileTool.execute("call-1", { action: "delete" }, new AbortController().signal),
+    await assert.rejects(
+      EmailProfileTool.execute("call-1", { action: "delete" }, new AbortController().signal),
       /requires a profile name/,
     );
   });
 
-  it("rejects unknown actions", () => {
-    assert.throws(
-      () =>
-        EmailProfileTool.execute(
-          "call-1",
-          { action: "nuke", name: "x" },
-          new AbortController().signal,
-        ),
+  it("rejects unknown actions", async () => {
+    await assert.rejects(
+      EmailProfileTool.execute(
+        "call-1",
+        { action: "nuke", name: "x" },
+        new AbortController().signal,
+      ),
       /Unknown action/,
     );
   });

@@ -10,6 +10,7 @@
  */
 
 import nodemailer from "nodemailer";
+import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import type { EmailConfig, SendParams, SendResult } from "../types.ts";
@@ -34,6 +35,63 @@ function configDir(): string {
   return path.resolve(path.join(home, ".pi"));
 }
 
+/**
+ * Directories an attachment may be read from.
+ *
+ * An allowlist, not a denylist: the agent acts on the contents of untrusted
+ * incoming mail, so a message that talks it into attaching a credential file
+ * must not succeed. The earlier check knew only about the pi config directory,
+ * which left ~/.ssh, ~/.aws and every .env in reach.
+ *
+ * The working directory and the temp locations are allowed because that is
+ * where the agent produces files and where `email_read` with downloadDir lands
+ * downloads before `email_send` forwards them. PI_EMAIL_ATTACH_ROOTS adds more,
+ * separated by the platform path delimiter.
+ */
+function allowedAttachmentRoots(): string[] {
+  const configured = (process.env.PI_EMAIL_ATTACH_ROOTS ?? "")
+    .split(path.delimiter)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  // `/tmp` is listed apart from os.tmpdir() because on macOS they are different
+  // places: tmpdir() is a per-user directory under /var/folders, while /tmp is
+  // the symlink people actually write to.
+  return [process.cwd(), os.tmpdir(), "/tmp", ...configured];
+}
+
+/** Resolve symlinks when the path exists; otherwise the plain absolute path. */
+function resolveForComparison(target: string): string {
+  const absolute = path.resolve(target);
+  try {
+    return fs.realpathSync(absolute);
+  } catch {
+    return absolute;
+  }
+}
+
+function isInside(target: string, root: string): boolean {
+  return target === root || target.startsWith(root + path.sep);
+}
+
+/**
+ * Whether `target` lies under `root`.
+ *
+ * Both the resolved and the plain absolute spelling of each side are compared:
+ * a file that does not exist yet cannot be resolved, so `/tmp/x` stays `/tmp/x`
+ * while an existing one becomes `/private/tmp/x` — same directory, two
+ * spellings, and only the second one would match a realpath'd root.
+ */
+function withinRoot(target: string, root: string): boolean {
+  const variants = (candidate: string) => [
+    resolveForComparison(candidate),
+    path.resolve(candidate),
+  ];
+  return variants(target).some((t) =>
+    variants(root).some((r) => isInside(t, r)),
+  );
+}
+
 function assertSafeAttachment(attachmentPath: string): void {
   const isUrlOrDataUri =
     /^[a-z][a-z0-9+.-]*:\/\//i.test(attachmentPath) ||
@@ -44,13 +102,18 @@ function assertSafeAttachment(attachmentPath: string): void {
     );
   }
 
-  // The agent acts on the contents of untrusted incoming mail, so a message
-  // that talks it into attaching the credential store must not succeed.
-  const resolved = path.resolve(attachmentPath);
-  const dir = configDir();
-  if (resolved === dir || resolved.startsWith(dir + path.sep)) {
+  // Absolute rule, checked first: the credential store is never attachable, not
+  // even when a configured root would otherwise cover it.
+  if (withinRoot(attachmentPath, configDir())) {
     throw new Error(
       `Refusing to attach a file from the pi configuration directory: ${attachmentPath}`,
+    );
+  }
+
+  const roots = allowedAttachmentRoots();
+  if (!roots.some((root) => withinRoot(attachmentPath, root))) {
+    throw new Error(
+      `Refusing to attach a file outside the allowed directories (${[...new Set(roots)].join(", ")}): ${attachmentPath}. Widen with PI_EMAIL_ATTACH_ROOTS.`,
     );
   }
 }
