@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [24, 26]
+        # 22 is the floor the package declares, so it has to be tested rather
+        # than assumed; 26 is what development runs on.
+        node-version: [22, 24, 26]
 
     steps:
       - uses: actions/checkout@v6
