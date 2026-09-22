@@ -52,6 +52,20 @@ function getClientVersion(): string {
   return version;
 }
 
+/**
+ * Exchange Online advertises `LOGINDISABLED` next to `AUTH=XOAUTH2` once
+ * basic auth is off. LOGINDISABLED only forbids the plaintext LOGIN command,
+ * but node-imap checks it before trying XOAUTH2 and aborts with "Logging in
+ * is disabled on this server". For OAuth connections, hide that capability
+ * from node-imap's login sequence so it goes on to AUTHENTICATE XOAUTH2.
+ * Password connections keep the original behaviour.
+ */
+export function allowXoauth2DespiteLoginDisabled(imap: Imap): void {
+  const original = imap.serverSupports.bind(imap);
+  imap.serverSupports = (capability: string) =>
+    capability === "LOGINDISABLED" ? false : original(capability);
+}
+
 export async function connectImap(config: EmailConfig): Promise<Imap> {
   const accessToken = config.oauth ? await getAccessToken(config) : undefined;
   return new Promise((resolve, reject) => {
@@ -72,6 +86,8 @@ export async function connectImap(config: EmailConfig): Promise<Imap> {
       connTimeout: 30000,
       authTimeout: 30000,
     });
+
+    if (accessToken) allowXoauth2DespiteLoginDisabled(imap);
 
     let settled = false;
 

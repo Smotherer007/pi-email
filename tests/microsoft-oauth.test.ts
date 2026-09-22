@@ -18,6 +18,7 @@ import {
   type FetchLike,
 } from "../src/oauth/microsoft.ts";
 import { buildMicrosoftProfile, parseLoginArgs } from "../src/commands/microsoft-login.ts";
+import { allowXoauth2DespiteLoginDisabled } from "../src/clients/imap-client.ts";
 
 const testHome = path.join(os.tmpdir(), "pi-email-oauth-test-" + process.pid);
 
@@ -268,5 +269,16 @@ describe("getAccessToken", () => {
       }),
       /email-login-microsoft/,
     );
+  });
+});
+
+describe("allowXoauth2DespiteLoginDisabled", () => {
+  it("hides LOGINDISABLED but keeps other capabilities", () => {
+    const caps = new Set(["LOGINDISABLED", "AUTH=XOAUTH2", "IDLE"]);
+    const fake: any = { serverSupports: (c: string) => caps.has(c) };
+    allowXoauth2DespiteLoginDisabled(fake);
+    assert.equal(fake.serverSupports("LOGINDISABLED"), false);
+    assert.equal(fake.serverSupports("AUTH=XOAUTH2"), true);
+    assert.equal(fake.serverSupports("MOVE"), false);
   });
 });
