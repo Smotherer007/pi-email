@@ -14,6 +14,7 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import type { EmailConfig, SendParams, SendResult } from "../types.ts";
+import { getAccessToken } from "../oauth/tokens.ts";
 
 export interface SendOptions extends SendParams {
   /** Message-ID of the message being answered (threading). */
@@ -196,10 +197,16 @@ export async function sendEmail(
     host: config.smtp.host,
     port: config.smtp.port,
     secure: config.smtp.secure,
-    auth: {
-      user: config.smtp.user,
-      pass: config.smtp.password,
-    },
+    auth: config.oauth
+      ? {
+          type: "OAuth2",
+          user: config.smtp.user,
+          accessToken: await getAccessToken(config),
+        }
+      : {
+          user: config.smtp.user,
+          pass: config.smtp.password,
+        },
     tls: config.smtp.tls,
   });
 

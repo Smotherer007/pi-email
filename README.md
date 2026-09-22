@@ -60,6 +60,39 @@ Use the email_setup tool to configure a an email account with the following deta
  - smtpRejectUnauthorized: false
 ```     
 
+## Microsoft 365 / Outlook work accounts (OAuth)
+
+Microsoft 365 (Exchange Online) work and school accounts no longer accept passwords over IMAP, and password-based SMTP AUTH is being retired too. These accounts sign in with OAuth2 instead, using the `/email-login-microsoft` command. Password profiles for all other providers keep working unchanged.
+
+```
+/email-login-microsoft work pat@example.com
+```
+
+The command prints a Microsoft login URL and starts a small callback server on `127.0.0.1:1456`. Open the URL, sign in (MFA works as usual), and the browser is redirected back to pi. The profile is saved with `outlook.office365.com:993` / `smtp.office365.com:587` and set active. Access tokens are refreshed automatically; the refresh token is stored in `~/.pi/email-config.json` (mode 600).
+
+**pi runs on a remote machine (SSH, container, VM)?** Forward the callback port from the machine where your browser runs before you open the URL:
+
+```bash
+ssh -L 1456:127.0.0.1:1456 user@remote-host
+```
+
+Without a tunnel the browser ends on an unreachable `localhost` page after login -- copy that page's address and paste it into the prompt pi shows.
+
+### App registration (once per organization)
+
+1. Microsoft Entra admin center → **App registrations** → **New registration**. Account type: *this organization only* or *any organization*.
+2. **Authentication** → *Add a platform* → **Mobile and desktop applications** → redirect URI `http://localhost` (the port is not part of the match).
+3. **API permissions** → Microsoft Graph → *Delegated*: `IMAP.AccessAsUser.All`, `SMTP.Send`, `offline_access`, `openid`, `profile`, `email`. Grant admin consent if your tenant requires it.
+4. Copy the **Application (client) ID**. pi asks for it on first login, or set it up front:
+
+```bash
+export PI_EMAIL_MS_CLIENT_ID=<client-id>
+export PI_EMAIL_MS_TENANT=<tenant-id or domain>   # optional, default "organizations"
+export PI_EMAIL_OAUTH_PORT=1456                    # optional callback port
+```
+
+For sending, SMTP AUTH must be enabled for the mailbox (Exchange admin: `Set-CASMailbox -Identity pat@example.com -SmtpClientAuthenticationDisabled $false`). Exchange files sent mail in *Sent Items* itself, so these profiles default to `appendToSent: false`.
+
 ## Tools
 
 | Tool | Description |
@@ -164,6 +197,7 @@ email_send:
 
 | Command | Description |
 |---------|-------------|
+| `/email-login-microsoft [profile] [email]` | Sign in a Microsoft 365 work account via OAuth (see above). |
 | `/inbox` | Trigger the agent to fetch recent inbox emails. |
 
 ## Configuration
@@ -254,6 +288,9 @@ The extension follows data-oriented programming principles:
 - **`src/tools/email-flag.ts`** -- Set/remove IMAP flags.
 - **`src/tools/email-delete.ts`** -- Delete emails.
 - **`src/tools/email-move.ts`** -- Move emails between folders.
+- **`src/oauth/microsoft.ts`** -- Microsoft OAuth2 (PKCE, token endpoint, loopback callback server, XOAUTH2).
+- **`src/oauth/tokens.ts`** -- Access-token refresh and persistence for OAuth profiles.
+- **`src/commands/microsoft-login.ts`** -- The `/email-login-microsoft` command.
 - **`src/pdf-reader.ts`** -- PDF text extraction via pdftotext.
 - **`index.ts`** -- Extension entry point. Loads config, registers all 14 tools, and registers the `/inbox` command.
 
@@ -271,10 +308,11 @@ Any email provider with standard IMAP/SMTP access works. Tested configurations:
 |----------|-----------|-----------|-----------|-----------|
 | Gmail | imap.gmail.com | 993 | smtp.gmail.com | 587 |
 | Outlook/Hotmail | outlook.office365.com | 993 | smtp-mail.outlook.com | 587 |
+| Microsoft 365 (work/school) | outlook.office365.com | 993 | smtp.office365.com | 587 |
 | Yahoo | imap.mail.yahoo.com | 993 | smtp.mail.yahoo.com | 587 |
 | iCloud | imap.mail.me.com | 993 | smtp.mail.me.com | 587 |
 
-Note: Gmail and many providers require app-specific passwords when 2FA is enabled.
+Note: Gmail and many providers require app-specific passwords when 2FA is enabled. Microsoft 365 work accounts use `/email-login-microsoft` (OAuth) instead of a password.
 
 ## Publishing as a pi Package
 

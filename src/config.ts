@@ -11,7 +11,7 @@
  * it is auto-migrated to { profiles: { "default": ... }, activeProfile: "default" }.
  */
 
-import type { EmailConfig, EmailProfiles } from "./types.ts";
+import type { EmailConfig, EmailProfiles, OAuthConfig } from "./types.ts";
 import { EmailNotConfiguredError } from "./types.ts";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -165,6 +165,34 @@ export function saveProfile(name: string, config: EmailConfig): void {
     activeProfile = name;
   }
   persistProfiles();
+}
+
+/**
+ * Store refreshed OAuth tokens on the profile that `config` came from.
+ *
+ * Callers hold the config object they resolved, not its profile name, so the
+ * profile is found by identity, falling back to its refresh token (the object
+ * may already have been replaced by a concurrent refresh). Returns the
+ * updated config, or null if the profile no longer exists.
+ */
+export function updateOAuthTokens(
+  config: EmailConfig,
+  tokens: Pick<OAuthConfig, "accessToken" | "refreshToken" | "expiresAt">,
+): EmailConfig | null {
+  const name =
+    Object.keys(profiles).find((n) => profiles[n] === config) ??
+    Object.keys(profiles).find(
+      (n) =>
+        profiles[n].oauth !== undefined &&
+        profiles[n].oauth?.refreshToken === config.oauth?.refreshToken,
+    );
+  if (!name) return null;
+  const current = profiles[name];
+  if (!current.oauth) return null;
+  const updated: EmailConfig = { ...current, oauth: { ...current.oauth, ...tokens } };
+  profiles[name] = updated;
+  persistProfiles();
+  return updated;
 }
 
 export function setActiveProfile(name: string): void {

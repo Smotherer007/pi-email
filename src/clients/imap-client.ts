@@ -13,6 +13,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { EmailConfig, EmailHeader, MailboxInfo } from "../types.ts";
 import { EmailNotFoundError, UnsafeAttachmentPathError } from "../types.ts";
+import { buildXoauth2 } from "../oauth/microsoft.ts";
+import { getAccessToken } from "../oauth/tokens.ts";
 
 const DEFAULT_TIMEOUT_MS = 60_000;
 const SHORT_TIMEOUT_MS = 30_000;
@@ -50,11 +52,14 @@ function getClientVersion(): string {
   return version;
 }
 
-export function connectImap(config: EmailConfig): Promise<Imap> {
+export async function connectImap(config: EmailConfig): Promise<Imap> {
+  const accessToken = config.oauth ? await getAccessToken(config) : undefined;
   return new Promise((resolve, reject) => {
     const imap = new Imap({
       user: config.imap.user,
-      password: config.imap.password,
+      ...(accessToken
+        ? { xoauth2: buildXoauth2(config.imap.user, accessToken), password: "" }
+        : { password: config.imap.password }),
       host: config.imap.host,
       port: config.imap.port,
       tls: config.imap.tls,

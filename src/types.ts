@@ -32,6 +32,22 @@ export interface SmtpConfig {
   };
 }
 
+/**
+ * OAuth2 credentials for providers that no longer accept passwords
+ * (Microsoft 365 / Exchange Online). When present, IMAP and SMTP authenticate
+ * with XOAUTH2 and the `password` fields are ignored.
+ */
+export interface OAuthConfig {
+  readonly provider: "microsoft";
+  readonly clientId: string;
+  /** Entra ID tenant: "organizations", "common", a tenant id or domain. */
+  readonly tenant: string;
+  readonly refreshToken: string;
+  readonly accessToken?: string;
+  /** Access token expiry, epoch milliseconds. */
+  readonly expiresAt?: number;
+}
+
 export interface EmailConfig {
   readonly imap: ImapConfig;
   readonly smtp: SmtpConfig;
@@ -44,6 +60,8 @@ export interface EmailConfig {
   readonly appendToSent?: boolean;
   /** Explicit Sent mailbox name. When omitted it is auto-detected. */
   readonly sentMailbox?: string;
+  /** Use OAuth2 (XOAUTH2) instead of passwords. */
+  readonly oauth?: OAuthConfig;
 }
 
 export interface EmailProfiles {

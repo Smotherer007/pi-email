@@ -19,6 +19,10 @@
  *   - email_move: Move an email to another mailbox
  *   - email_flag: Set or remove IMAP flags (read/unread/flagged)
  *
+ * Commands:
+ *   - /email-login-microsoft: OAuth2 login for Microsoft 365 accounts
+ *   - /inbox: Ask the agent to fetch recent inbox emails
+ *
  * Data-oriented design:
  *   - All domain data is represented as plain immutable interfaces (types.ts)
  *   - I/O is isolated in client modules (clients/)
@@ -44,6 +48,7 @@ import { EmailMoveTool } from "./src/tools/email-move.ts";
 import { EmailFlagTool } from "./src/tools/email-flag.ts";
 import { EmailStatusTool } from "./src/tools/email-status.ts";
 import { EmailProfileTool } from "./src/tools/email-profile.ts";
+import { microsoftLoginHandler } from "./src/commands/microsoft-login.ts";
 
 export default function (pi: ExtensionAPI) {
   // Load saved config on startup
@@ -64,6 +69,13 @@ export default function (pi: ExtensionAPI) {
   pi.registerTool(EmailDeleteTool);
   pi.registerTool(EmailMoveTool);
   pi.registerTool(EmailFlagTool);
+
+  // Microsoft 365 work/school accounts: OAuth2 login in the browser
+  pi.registerCommand("email-login-microsoft", {
+    description:
+      "Sign in a Microsoft 365 / Outlook work account via OAuth (usage: /email-login-microsoft [profile] [email])",
+    handler: microsoftLoginHandler,
+  });
 
   // Register a shortcut to quickly check inbox
   pi.registerCommand("inbox", {

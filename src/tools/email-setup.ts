@@ -14,7 +14,7 @@ export const EmailSetupTool = {
   name: "email_setup",
   label: "Email Setup",
   description:
-    "Configure your email account credentials (IMAP/SMTP). Call this first before using any other email tools. After setup, credentials are stored in ~/.pi/email-config.json (readable only by you).",
+    "Configure your email account credentials (IMAP/SMTP). Call this first before using any other email tools. After setup, credentials are stored in ~/.pi/email-config.json (readable only by you). Microsoft 365 / Exchange Online work accounts do not accept passwords: ask the user to run the /email-login-microsoft command instead.",
   parameters: Type.Object({
     name: Type.String({
       description: "Profile name, e.g. 'work', 'personal', 'gmail'. Use a short, memorable name.",
