@@ -257,8 +257,10 @@ export function formatProfileStatus(
     const cfg = profiles[name];
     const marker = name === activeProfile ? "[active]" : "       ";
     const fromStr = cfg.fromName ? ` ("${cfg.fromName}")` : "";
-    const authStr = cfg.oauth ? " [Microsoft OAuth]" : "";
+    const graph = cfg.oauth?.api === "graph";
+    const authStr = graph ? " [Microsoft Graph]" : cfg.oauth ? " [Microsoft OAuth]" : "";
     lines.push(`${marker} ${name}: ${cfg.imap.user}${fromStr}${authStr}`);
+    if (graph) continue;
     lines.push(`       IMAP: ${cfg.imap.host}:${cfg.imap.port} (TLS: ${cfg.imap.tls})`);
     lines.push(`       SMTP: ${cfg.smtp.host}:${cfg.smtp.port} (Secure: ${cfg.smtp.secure})`);
   }

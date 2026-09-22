@@ -6,7 +6,8 @@
  */
 
 import { Type } from "typebox";
-import { setFlags } from "../clients/imap-client.ts";
+import type { MessageUid } from "../types.ts";
+import { setFlags } from "../clients/mail.ts";
 import { resolveConfig } from "../config.ts";
 
 /** Convert friendly flag names to IMAP flag syntax */
@@ -37,7 +38,9 @@ export const EmailFlagTool = {
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
     ),
-    uid: Type.Number({ description: "Email UID to flag" }),
+    uid: Type.Union([Type.Number(), Type.String()], {
+      description: "Email UID to flag (numeric IMAP UID, or the message id string for Microsoft Graph profiles)",
+    }),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox name, defaults to INBOX" }),
     ),
@@ -59,7 +62,7 @@ export const EmailFlagTool = {
     _toolCallId: string,
     params: {
       profile?: string;
-      uid: number;
+      uid: MessageUid;
       mailbox?: string;
       add?: string[];
       remove?: string[];

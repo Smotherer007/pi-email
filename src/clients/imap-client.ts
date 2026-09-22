@@ -354,6 +354,41 @@ function uniquePath(target: string): string {
   return path.join(dir, `${base}-${Date.now()}${ext}`);
 }
 
+/**
+ * Save a parsed message's attachments into downloadDir (when given) under
+ * sanitised, non-colliding names. On failure every file written so far is
+ * removed again and the error is rethrown. Shared by the IMAP and Graph
+ * backends.
+ */
+export function saveAttachments(
+  parsed: ParsedMail,
+  downloadDir: string | null,
+): string[] {
+  const savedFiles: string[] = [];
+  if (!downloadDir || !parsed.attachments?.length) return savedFiles;
+  try {
+    if (!fs.existsSync(downloadDir)) {
+      fs.mkdirSync(downloadDir, { recursive: true });
+    }
+    parsed.attachments.forEach((att, index) => {
+      const name = safeAttachmentName(att.filename, index);
+      const filePath = uniquePath(resolveAttachmentPath(downloadDir, name));
+      fs.writeFileSync(filePath, att.content);
+      savedFiles.push(filePath);
+    });
+    return savedFiles;
+  } catch (e) {
+    for (const f of savedFiles) {
+      try {
+        fs.unlinkSync(f);
+      } catch {
+        /* ignore */
+      }
+    }
+    throw e;
+  }
+}
+
 // Mailbox listing
 
 interface RawBox {
@@ -506,7 +541,7 @@ export function fetchHeaders(
 
               fetch.once("error", (err: Error) => settle.reject(err));
               fetch.once("end", () => {
-                headers.sort((a, b) => b.uid - a.uid);
+                headers.sort((a, b) => (b.uid as number) - (a.uid as number));
                 settle.resolve({ headers, total });
               });
             }),
@@ -552,30 +587,9 @@ export function readEmail(
                   // isolation corrupted multi-byte characters split across a
                   // chunk boundary.
                   const parsed = await simpleParser(Buffer.concat(chunks));
-
-                  if (downloadDir && parsed.attachments?.length) {
-                    if (!fs.existsSync(downloadDir)) {
-                      fs.mkdirSync(downloadDir, { recursive: true });
-                    }
-                    parsed.attachments.forEach((att, index) => {
-                      const name = safeAttachmentName(att.filename, index);
-                      const filePath = uniquePath(
-                        resolveAttachmentPath(downloadDir, name),
-                      );
-                      fs.writeFileSync(filePath, att.content);
-                      savedFiles.push(filePath);
-                    });
-                  }
-
+                  savedFiles.push(...saveAttachments(parsed, downloadDir));
                   settle.resolve({ parsed, savedFiles });
                 } catch (e) {
-                  for (const f of savedFiles) {
-                    try {
-                      fs.unlinkSync(f);
-                    } catch {
-                      /* ignore */
-                    }
-                  }
                   settle.reject(e);
                 }
               });
@@ -634,7 +648,7 @@ export function searchEmails(
 
               fetch.once("error", (err: Error) => settle.reject(err));
               fetch.once("end", () => {
-                headers.sort((a, b) => b.uid - a.uid);
+                headers.sort((a, b) => (b.uid as number) - (a.uid as number));
                 settle.resolve({ headers, totalResults: results.length });
               });
             }),
@@ -706,6 +720,8 @@ export function setFlags(
 export interface DeleteOutcome {
   /** True when the message was permanently removed via UID EXPUNGE. */
   readonly expunged: boolean;
+  /** Set when the backend moved the message to a trash folder instead. */
+  readonly movedTo?: string;
 }
 
 export function deleteEmail(

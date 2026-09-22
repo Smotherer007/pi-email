@@ -3,7 +3,7 @@
  */
 
 import { Type } from "typebox";
-import { searchEmails } from "../clients/imap-client.ts";
+import { searchEmails } from "../clients/mail.ts";
 import { resolveConfig } from "../config.ts";
 import { formatSearchResults } from "../formatting/formatters.ts";
 import type { SearchParams } from "../types.ts";

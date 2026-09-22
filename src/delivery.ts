@@ -9,6 +9,7 @@
 
 import { appendToSent } from "./clients/imap-client.ts";
 import { sendEmail } from "./clients/smtp-client.ts";
+import * as graph from "./clients/graph-client.ts";
 import type { SendOptions } from "./clients/smtp-client.ts";
 import type {
   EmailConfig,
@@ -41,6 +42,14 @@ export async function deliverEmail(
   params: SendParams | SendOptions,
   signal?: AbortSignal,
 ): Promise<DeliveryResult> {
+  if (graph.isGraphProfile(config)) {
+    const sent = await graph.sendEmail(config, params, signal);
+    return {
+      result: { messageId: sent.messageId, to: sent.to, subject: sent.subject },
+      sentCopy: { status: "skipped", reason: "Exchange files sent mail in Sent Items itself" },
+    };
+  }
+
   const sent = await sendEmail(config, params);
   const result: SendResult = {
     messageId: sent.messageId,

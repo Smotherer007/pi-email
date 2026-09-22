@@ -4,9 +4,14 @@
  * Interactive command (not a tool) on purpose: the user completes the login
  * in a browser, and tokens never pass through the model.
  *
- * Usage: /email-login-microsoft [profile] [email]
+ * Usage: /email-login-microsoft [profile] [email] [--imap]
+ *
+ * By default the account uses Microsoft Graph, which works in tenants that
+ * disable IMAP and SMTP AUTH. `--imap` (or PI_EMAIL_MS_API=outlook) uses
+ * IMAP/SMTP with XOAUTH2 instead.
  *
  * Environment:
+ *   PI_EMAIL_MS_API         "graph" (default) or "outlook" (IMAP/SMTP)
  *   PI_EMAIL_MS_CLIENT_ID   Entra ID application (client) id
  *   PI_EMAIL_MS_TENANT      tenant, default "organizations"
  *   PI_EMAIL_OAUTH_PORT     loopback callback port, default 1456
@@ -22,6 +27,7 @@ import {
   DEFAULT_TENANT,
   MICROSOFT_IMAP_HOST,
   MICROSOFT_SMTP_HOST,
+  type MicrosoftApi,
   buildAuthorizeUrl,
   exchangeCode,
   generatePkce,
@@ -34,11 +40,28 @@ import {
 const LOGIN_TIMEOUT_MS = 10 * 60_000;
 const WIDGET_KEY = "pi-email-login";
 
-export function parseLoginArgs(args: string): { profile?: string; email?: string } {
+export function parseLoginArgs(args: string): {
+  profile?: string;
+  email?: string;
+  api?: MicrosoftApi;
+} {
   const parts = args.trim().split(/\s+/).filter(Boolean);
-  const email = parts.find((p) => p.includes("@"));
-  const profile = parts.find((p) => !p.includes("@"));
-  return { profile, email };
+  const flags = parts.filter((p) => p.startsWith("--"));
+  const words = parts.filter((p) => !p.startsWith("--"));
+  const email = words.find((p) => p.includes("@"));
+  const profile = words.find((p) => !p.includes("@"));
+  const api: MicrosoftApi | undefined = flags.includes("--imap")
+    ? "outlook"
+    : flags.includes("--graph")
+      ? "graph"
+      : undefined;
+  return { profile, email, ...(api && { api }) };
+}
+
+export function resolveApi(flag: MicrosoftApi | undefined, env: string | undefined): MicrosoftApi {
+  if (flag) return flag;
+  const v = env?.trim().toLowerCase();
+  return v === "outlook" || v === "imap" ? "outlook" : "graph";
 }
 
 /** Build the profile for a Microsoft account, keeping user settings of an existing one. */
@@ -49,21 +72,26 @@ export function buildMicrosoftProfile(opts: {
   refreshToken: string;
   accessToken: string;
   expiresAt: number;
+  api?: MicrosoftApi;
   existing?: EmailConfig | null;
 }): EmailConfig {
   const existing = opts.existing;
+  const api = opts.api ?? "outlook";
+  // Graph profiles never open IMAP/SMTP connections; the host fields only
+  // document where the mail goes.
+  const graph = api === "graph";
   return {
     imap: {
-      host: MICROSOFT_IMAP_HOST,
-      port: 993,
+      host: graph ? "graph.microsoft.com" : MICROSOFT_IMAP_HOST,
+      port: graph ? 443 : 993,
       tls: true,
       user: opts.email,
       password: "",
     },
     smtp: {
-      host: MICROSOFT_SMTP_HOST,
-      port: 587,
-      secure: false,
+      host: graph ? "graph.microsoft.com" : MICROSOFT_SMTP_HOST,
+      port: graph ? 443 : 587,
+      secure: graph,
       user: opts.email,
       password: "",
     },
@@ -73,6 +101,7 @@ export function buildMicrosoftProfile(opts: {
     ...(existing?.sentMailbox !== undefined && { sentMailbox: existing.sentMailbox }),
     oauth: {
       provider: "microsoft",
+      api,
       clientId: opts.clientId,
       tenant: opts.tenant,
       refreshToken: opts.refreshToken,
@@ -117,11 +146,12 @@ export async function microsoftLoginHandler(
   const port = Number(process.env.PI_EMAIL_OAUTH_PORT) || DEFAULT_CALLBACK_PORT;
   const host = process.env.PI_OAUTH_CALLBACK_HOST?.trim() || DEFAULT_CALLBACK_HOST;
   const loginHint = parsed.email ?? existing?.imap.user;
+  const api = resolveApi(parsed.api, process.env.PI_EMAIL_MS_API);
 
   const { verifier, challenge } = generatePkce();
   const state = generateState();
   const redirectUri = redirectUriFor(port);
-  const url = buildAuthorizeUrl({ clientId, tenant, redirectUri, challenge, state, loginHint });
+  const url = buildAuthorizeUrl({ clientId, tenant, redirectUri, challenge, state, loginHint, api });
 
   let server;
   try {
@@ -172,7 +202,7 @@ export async function microsoftLoginHandler(
       return;
     }
 
-    const tokens = await exchangeCode({ clientId, tenant, code, verifier, redirectUri });
+    const tokens = await exchangeCode({ clientId, tenant, code, verifier, redirectUri, api });
     const email =
       tokens.username ?? parsed.email ?? existing?.imap.user ?? (await ask(ctx, "Email address"));
     if (!email) throw new Error("Could not determine the account's email address.");
@@ -186,11 +216,15 @@ export async function microsoftLoginHandler(
         refreshToken: tokens.refreshToken,
         accessToken: tokens.accessToken,
         expiresAt: tokens.expiresAt,
+        api,
         existing,
       }),
     );
     setActiveProfile(profileName);
-    ctx.ui.notify(`Signed in as ${email}. Profile "${profileName}" is active.`, "info");
+    ctx.ui.notify(
+      `Signed in as ${email} (${api === "graph" ? "Microsoft Graph" : "IMAP/SMTP"}). Profile "${profileName}" is active.`,
+      "info",
+    );
   } catch (err) {
     ctx.ui.notify(err instanceof Error ? err.message : String(err), "error");
   } finally {

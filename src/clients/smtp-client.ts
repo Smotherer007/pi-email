@@ -177,21 +177,49 @@ function buildMailOptions(
   return mailOptions;
 }
 
-export async function sendEmail(
+export interface ComposedMessage {
+  readonly raw: Buffer;
+  readonly envelope: unknown;
+  readonly messageId: string;
+}
+
+/**
+ * Build the RFC 822 message for `params` without sending it.
+ *
+ * `keepBcc` keeps the Bcc header in the raw message. SMTP must not do that
+ * (the envelope carries Bcc recipients), but Microsoft Graph takes its
+ * recipients from the MIME headers, so a Graph send needs it.
+ */
+export async function composeMessage(
   config: EmailConfig,
   params: SendParams | SendOptions,
-): Promise<SentMessage> {
+  options: { keepBcc?: boolean } = {},
+): Promise<ComposedMessage> {
   const mailOptions = buildMailOptions(config, params);
+  if (options.keepBcc) mailOptions.keepBcc = true;
 
-  // Compose first, then transmit the composed bytes. newline "windows" gives
-  // CRLF line endings, which both SMTP and IMAP APPEND require.
+  // newline "windows" gives CRLF line endings, which SMTP, IMAP APPEND and
+  // Graph MIME uploads all expect.
   const composer = nodemailer.createTransport({
     streamTransport: true,
     buffer: true,
     newline: "windows",
   });
   const built: any = await composer.sendMail(mailOptions as any);
-  const raw: Buffer = built?.message ?? Buffer.alloc(0);
+  return {
+    raw: built?.message ?? Buffer.alloc(0),
+    envelope: built?.envelope,
+    messageId: built?.messageId || "",
+  };
+}
+
+export async function sendEmail(
+  config: EmailConfig,
+  params: SendParams | SendOptions,
+): Promise<SentMessage> {
+  // Compose first, then transmit the composed bytes.
+  const built = await composeMessage(config, params);
+  const raw = built.raw;
 
   const transporter = nodemailer.createTransport({
     host: config.smtp.host,

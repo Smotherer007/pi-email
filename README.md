@@ -62,13 +62,13 @@ Use the email_setup tool to configure a an email account with the following deta
 
 ## Microsoft 365 / Outlook work accounts (OAuth)
 
-Microsoft 365 (Exchange Online) work and school accounts no longer accept passwords over IMAP, and password-based SMTP AUTH is being retired too. These accounts sign in with OAuth2 instead, using the `/email-login-microsoft` command. Password profiles for all other providers keep working unchanged.
+Microsoft 365 (Exchange Online) work and school accounts do not accept passwords, and many companies switch IMAP and SMTP AUTH off entirely. These accounts sign in with OAuth2 via the `/email-login-microsoft` command and, by default, read and send mail through **Microsoft Graph** -- no IMAP or SMTP needed. Password profiles for all other providers keep working unchanged.
 
 ```
 /email-login-microsoft work pat@example.com
 ```
 
-The command prints a Microsoft login URL and starts a small callback server on `127.0.0.1:1456`. Open the URL, sign in (MFA works as usual), and the browser is redirected back to pi. The profile is saved with `outlook.office365.com:993` / `smtp.office365.com:587` and set active. Access tokens are refreshed automatically; the refresh token is stored in `~/.pi/email-config.json` (mode 600).
+The command prints a Microsoft login URL and starts a small callback server on `127.0.0.1:1456`. Open the URL, sign in (MFA works as usual), and the browser is redirected back to pi. The profile is saved and set active; access tokens are refreshed automatically and the refresh token is stored in `~/.pi/email-config.json` (mode 600).
 
 **pi runs on a remote machine (SSH, container, VM)?** Forward the callback port from the machine where your browser runs before you open the URL:
 
@@ -76,13 +76,26 @@ The command prints a Microsoft login URL and starts a small callback server on `
 ssh -L 1456:127.0.0.1:1456 user@remote-host
 ```
 
-Without a tunnel the browser ends on an unreachable `localhost` page after login -- copy that page's address and paste it into the prompt pi shows.
+Inside a Docker container, bind the callback to all interfaces (`PI_OAUTH_CALLBACK_HOST=0.0.0.0`) and forward to the container IP, or publish the port. Without any tunnel the browser ends on an unreachable `localhost` page after login -- copy that page's address and paste it into the prompt pi shows.
+
+### How Graph profiles behave
+
+All tools work the same way, with these differences:
+
+- Message ids are Graph ids (long strings) instead of numeric UIDs. They stay stable when a message is moved.
+- Mailboxes are addressed by path (`Posteingang/Kunden`) or by the usual aliases (`INBOX`, `Sent`, `Drafts`, `Trash`, `Junk`, `Archive` and their German names).
+- `email_delete` moves the message to *Deleted Items* (recoverable).
+- `email_flag` supports `Seen` and `Flagged`.
+- Sent mail is filed in *Sent Items* by Exchange itself.
+- A single message (including attachments) is limited to about 3 MB.
+
+To use IMAP/SMTP with OAuth instead (tenants that allow it), log in with `/email-login-microsoft work --imap` or set `PI_EMAIL_MS_API=outlook`.
 
 ### App registration (once per organization)
 
 1. Microsoft Entra admin center → **App registrations** → **New registration**. Account type: *this organization only* or *any organization*.
 2. **Authentication** → *Add a platform* → **Mobile and desktop applications** → redirect URI `http://localhost` (the port is not part of the match).
-3. **API permissions** → Microsoft Graph → *Delegated*: `IMAP.AccessAsUser.All`, `SMTP.Send`, `offline_access`, `openid`, `profile`, `email`. Grant admin consent if your tenant requires it.
+3. **API permissions** → Microsoft Graph → *Delegated*: `Mail.ReadWrite`, `Mail.Send`, `offline_access`, `openid`, `profile`, `email`. Grant admin consent if your tenant requires it. (For `--imap`: `IMAP.AccessAsUser.All` and `SMTP.Send` instead.)
 4. Copy the **Application (client) ID**. pi asks for it on first login, or set it up front:
 
 ```bash
@@ -91,7 +104,7 @@ export PI_EMAIL_MS_TENANT=<tenant-id or domain>   # optional, default "organizat
 export PI_EMAIL_OAUTH_PORT=1456                    # optional callback port
 ```
 
-For sending, SMTP AUTH must be enabled for the mailbox (Exchange admin: `Set-CASMailbox -Identity pat@example.com -SmtpClientAuthenticationDisabled $false`). Exchange files sent mail in *Sent Items* itself, so these profiles default to `appendToSent: false`.
+The permissions are delegated: the app only ever reaches the mailbox of the signed-in user.
 
 ## Tools
 
@@ -197,7 +210,7 @@ email_send:
 
 | Command | Description |
 |---------|-------------|
-| `/email-login-microsoft [profile] [email]` | Sign in a Microsoft 365 work account via OAuth (see above). |
+| `/email-login-microsoft [profile] [email] [--imap]` | Sign in a Microsoft 365 work account via OAuth; uses Microsoft Graph unless `--imap` (see above). |
 | `/inbox` | Trigger the agent to fetch recent inbox emails. |
 
 ## Configuration
@@ -270,7 +283,9 @@ The extension follows data-oriented programming principles:
 - **`src/types.ts`** -- All domain data types as plain immutable interfaces. No behavior, no classes, no inheritance.
 - **`src/config.ts`** -- Configuration state management and file persistence.
 - **`src/clients/imap-client.ts`** -- IMAP operations. Each function opens a connection, performs work, and closes. Returns plain data.
-- **`src/clients/smtp-client.ts`** -- SMTP send operations via nodemailer.
+- **`src/clients/smtp-client.ts`** -- Message composition and SMTP send operations via nodemailer.
+- **`src/clients/graph-client.ts`** -- Microsoft Graph backend (folders, messages, flags, drafts, sending) for Microsoft 365 profiles.
+- **`src/clients/mail.ts`** -- Dispatches each operation to the IMAP or Graph backend depending on the profile.
 - **`src/delivery.ts`** -- Outgoing delivery: sends via SMTP, then stores a Sent-folder copy via IMAP APPEND (skipped for Gmail or when disabled).
 - **`src/reply.ts`** -- Pure reply helpers (recipient derivation, References chain) shared by `email_reply` and `email_draft_reply`.
 - **`src/formatting/formatters.ts`** -- Pure transformation functions that convert domain data into display strings. No side effects.
@@ -308,7 +323,7 @@ Any email provider with standard IMAP/SMTP access works. Tested configurations:
 |----------|-----------|-----------|-----------|-----------|
 | Gmail | imap.gmail.com | 993 | smtp.gmail.com | 587 |
 | Outlook/Hotmail | outlook.office365.com | 993 | smtp-mail.outlook.com | 587 |
-| Microsoft 365 (work/school) | outlook.office365.com | 993 | smtp.office365.com | 587 |
+| Microsoft 365 (work/school) | via Microsoft Graph (`/email-login-microsoft`) | | | |
 | Yahoo | imap.mail.yahoo.com | 993 | smtp.mail.yahoo.com | 587 |
 | iCloud | imap.mail.me.com | 993 | smtp.mail.me.com | 587 |
 

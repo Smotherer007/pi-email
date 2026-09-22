@@ -3,7 +3,7 @@
  */
 
 import { Type } from "typebox";
-import { moveEmail } from "../clients/imap-client.ts";
+import { moveEmail } from "../clients/mail.ts";
 import { resolveConfig } from "../config.ts";
 import type { MoveParams } from "../types.ts";
 
@@ -15,7 +15,9 @@ export const EmailMoveTool = {
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
     ),
-    uid: Type.Number({ description: "Email UID to move" }),
+    uid: Type.Union([Type.Number(), Type.String()], {
+      description: "Email UID to move (numeric IMAP UID, or the message id string for Microsoft Graph profiles)",
+    }),
     destination: Type.String({ description: "Destination mailbox name" }),
     source: Type.Optional(
       Type.String({ description: "Source mailbox, defaults to INBOX" }),

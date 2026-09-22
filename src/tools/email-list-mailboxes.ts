@@ -3,7 +3,7 @@
  */
 
 import { Type } from "typebox";
-import { listMailboxes } from "../clients/imap-client.ts";
+import { listMailboxes } from "../clients/mail.ts";
 import { resolveConfig } from "../config.ts";
 import { formatMailboxList } from "../formatting/formatters.ts";
 

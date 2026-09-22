@@ -19,14 +19,27 @@ import * as http from "node:http";
 export const MICROSOFT_IMAP_HOST = "outlook.office365.com";
 export const MICROSOFT_SMTP_HOST = "smtp.office365.com";
 
-export const MICROSOFT_SCOPES = [
-  "openid",
-  "profile",
-  "email",
-  "offline_access",
-  "https://outlook.office.com/IMAP.AccessAsUser.All",
-  "https://outlook.office.com/SMTP.Send",
-] as const;
+export type MicrosoftApi = "graph" | "outlook";
+
+const BASE_SCOPES = ["openid", "profile", "email", "offline_access"];
+
+/**
+ * A Microsoft access token is issued for one resource, so Graph and the
+ * Outlook IMAP/SMTP endpoints need separate scope sets.
+ */
+export function scopesFor(api: MicrosoftApi = "outlook"): string {
+  const resource =
+    api === "graph"
+      ? [
+          "https://graph.microsoft.com/Mail.ReadWrite",
+          "https://graph.microsoft.com/Mail.Send",
+        ]
+      : [
+          "https://outlook.office.com/IMAP.AccessAsUser.All",
+          "https://outlook.office.com/SMTP.Send",
+        ];
+  return [...BASE_SCOPES, ...resource].join(" ");
+}
 
 /** Default tenant: any work or school account. */
 export const DEFAULT_TENANT = "organizations";
@@ -85,13 +98,14 @@ export function buildAuthorizeUrl(opts: {
   challenge: string;
   state: string;
   loginHint?: string;
+  api?: MicrosoftApi;
 }): string {
   const url = new URL(`${authorityBase(opts.tenant)}/authorize`);
   url.searchParams.set("client_id", opts.clientId);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("redirect_uri", opts.redirectUri);
   url.searchParams.set("response_mode", "query");
-  url.searchParams.set("scope", MICROSOFT_SCOPES.join(" "));
+  url.searchParams.set("scope", scopesFor(opts.api));
   url.searchParams.set("code_challenge", opts.challenge);
   url.searchParams.set("code_challenge_method", "S256");
   url.searchParams.set("state", opts.state);
@@ -192,6 +206,7 @@ export function exchangeCode(opts: {
   code: string;
   verifier: string;
   redirectUri: string;
+  api?: MicrosoftApi;
   now?: number;
   signal?: AbortSignal;
 }): Promise<MicrosoftTokens> {
@@ -204,7 +219,7 @@ export function exchangeCode(opts: {
       code: opts.code,
       code_verifier: opts.verifier,
       redirect_uri: opts.redirectUri,
-      scope: MICROSOFT_SCOPES.join(" "),
+      scope: scopesFor(opts.api),
     },
     undefined,
     opts.now ?? Date.now(),
@@ -217,6 +232,7 @@ export function refreshTokens(opts: {
   clientId: string;
   tenant: string;
   refreshToken: string;
+  api?: MicrosoftApi;
   now?: number;
   signal?: AbortSignal;
 }): Promise<MicrosoftTokens> {
@@ -227,7 +243,7 @@ export function refreshTokens(opts: {
       client_id: opts.clientId,
       grant_type: "refresh_token",
       refresh_token: opts.refreshToken,
-      scope: MICROSOFT_SCOPES.join(" "),
+      scope: scopesFor(opts.api),
     },
     opts.refreshToken,
     opts.now ?? Date.now(),

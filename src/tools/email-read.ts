@@ -3,7 +3,7 @@
  */
 
 import { Type } from "typebox";
-import { readEmail } from "../clients/imap-client.ts";
+import { readEmail } from "../clients/mail.ts";
 import { resolveConfig } from "../config.ts";
 import { addressText, formatEmailBody } from "../formatting/formatters.ts";
 import { extractPdfsFromAttachments } from "../pdf-reader.ts";
@@ -18,7 +18,9 @@ export const EmailReadTool = {
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
     ),
-    uid: Type.Number({ description: "Email UID from email_fetch" }),
+    uid: Type.Union([Type.Number(), Type.String()], {
+      description: "Email UID from email_fetch (numeric IMAP UID, or the message id string for Microsoft Graph profiles)",
+    }),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox name, defaults to INBOX" }),
     ),

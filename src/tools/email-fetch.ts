@@ -3,7 +3,7 @@
  */
 
 import { Type } from "typebox";
-import { fetchHeaders } from "../clients/imap-client.ts";
+import { fetchHeaders } from "../clients/mail.ts";
 import { resolveConfig } from "../config.ts";
 import { formatHeaderList } from "../formatting/formatters.ts";
 import type { FetchParams } from "../types.ts";

@@ -8,7 +8,8 @@
  */
 
 import { Type } from "typebox";
-import { appendDraftMessage, readEmail } from "../clients/imap-client.ts";
+import type { MessageUid } from "../types.ts";
+import { appendDraftMessage, readEmail } from "../clients/mail.ts";
 import { resolveConfig } from "../config.ts";
 import { buildReferences, buildReplyRecipients } from "../reply.ts";
 
@@ -58,7 +59,9 @@ export const EmailDraftReplyTool = {
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
     ),
-    uid: Type.Number({ description: "Email UID to reply to (from email_fetch)" }),
+    uid: Type.Union([Type.Number(), Type.String()], {
+      description: "Email UID to reply to (from email_fetch) (numeric IMAP UID, or the message id string for Microsoft Graph profiles)",
+    }),
     body: Type.String({ description: "Draft reply body text" }),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox containing the original email, defaults to INBOX" }),
@@ -78,7 +81,7 @@ export const EmailDraftReplyTool = {
     _toolCallId: string,
     params: {
       profile?: string;
-      uid: number;
+      uid: MessageUid;
       body: string;
       mailbox?: string;
       draftMailbox?: string;

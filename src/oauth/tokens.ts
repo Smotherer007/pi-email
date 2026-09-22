@@ -7,14 +7,22 @@
  * other's refresh token.
  */
 
-import { updateOAuthTokens } from "../config.ts";
+// Namespace import: tool tests mock config.ts with only the functions they
+// use, and a named import of a missing export would fail at link time.
+import * as configStore from "../config.ts";
 import type { EmailConfig } from "../types.ts";
-import { isExpired, refreshTokens, type MicrosoftTokens } from "./microsoft.ts";
+import {
+  isExpired,
+  refreshTokens,
+  type MicrosoftApi,
+  type MicrosoftTokens,
+} from "./microsoft.ts";
 
 type Refresher = (opts: {
   clientId: string;
   tenant: string;
   refreshToken: string;
+  api?: MicrosoftApi;
 }) => Promise<MicrosoftTokens>;
 
 const inflight = new Map<string, Promise<string>>();
@@ -30,7 +38,7 @@ export async function getAccessToken(
     return oauth.accessToken;
   }
 
-  const key = `${oauth.provider}|${oauth.clientId}|${config.imap.user}`;
+  const key = `${oauth.provider}|${oauth.api ?? "outlook"}|${oauth.clientId}|${config.imap.user}`;
   const pending = inflight.get(key);
   if (pending) return pending;
 
@@ -40,8 +48,9 @@ export async function getAccessToken(
         clientId: oauth.clientId,
         tenant: oauth.tenant,
         refreshToken: oauth.refreshToken,
+        api: oauth.api ?? "outlook",
       });
-      updateOAuthTokens(config, {
+      configStore.updateOAuthTokens(config, {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
         expiresAt: tokens.expiresAt,

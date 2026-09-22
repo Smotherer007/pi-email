@@ -7,7 +7,8 @@
  */
 
 import { Type } from "typebox";
-import { readEmail, setFlags } from "../clients/imap-client.ts";
+import type { MessageUid } from "../types.ts";
+import { readEmail, setFlags } from "../clients/mail.ts";
 import { deliverEmail } from "../delivery.ts";
 import { resolveConfig } from "../config.ts";
 import { formatSentCopy } from "../formatting/formatters.ts";
@@ -22,7 +23,9 @@ export const EmailReplyTool = {
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
     ),
-    uid: Type.Number({ description: "Email UID to reply to (from email_fetch)" }),
+    uid: Type.Union([Type.Number(), Type.String()], {
+      description: "Email UID to reply to (from email_fetch) (numeric IMAP UID, or the message id string for Microsoft Graph profiles)",
+    }),
     body: Type.String({ description: "Reply body text" }),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox containing the original email, defaults to INBOX" }),
@@ -42,7 +45,7 @@ export const EmailReplyTool = {
     _toolCallId: string,
     params: {
       profile?: string;
-      uid: number;
+      uid: MessageUid;
       body: string;
       mailbox?: string;
       html?: string;

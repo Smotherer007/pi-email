@@ -73,7 +73,7 @@ export default function (pi: ExtensionAPI) {
   // Microsoft 365 work/school accounts: OAuth2 login in the browser
   pi.registerCommand("email-login-microsoft", {
     description:
-      "Sign in a Microsoft 365 / Outlook work account via OAuth (usage: /email-login-microsoft [profile] [email])",
+      "Sign in a Microsoft 365 / Outlook work account via OAuth (usage: /email-login-microsoft [profile] [email] [--imap])",
     handler: microsoftLoginHandler,
   });
 

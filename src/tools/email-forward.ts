@@ -7,7 +7,8 @@
  */
 
 import { Type } from "typebox";
-import { readEmail } from "../clients/imap-client.ts";
+import type { MessageUid } from "../types.ts";
+import { readEmail } from "../clients/mail.ts";
 import { deliverEmail } from "../delivery.ts";
 import { resolveConfig } from "../config.ts";
 import { addressText, formatSentCopy } from "../formatting/formatters.ts";
@@ -21,7 +22,9 @@ export const EmailForwardTool = {
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
     ),
-    uid: Type.Number({ description: "Email UID to forward (from email_fetch)" }),
+    uid: Type.Union([Type.Number(), Type.String()], {
+      description: "Email UID to forward (from email_fetch) (numeric IMAP UID, or the message id string for Microsoft Graph profiles)",
+    }),
     to: Type.String({ description: "Recipient email address(es), comma-separated" }),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox containing the original email, defaults to INBOX" }),
@@ -37,7 +40,7 @@ export const EmailForwardTool = {
     _toolCallId: string,
     params: {
       profile?: string;
-      uid: number;
+      uid: MessageUid;
       to: string;
       mailbox?: string;
       body?: string;

@@ -3,7 +3,7 @@
  */
 
 import { Type } from "typebox";
-import { deleteEmail } from "../clients/imap-client.ts";
+import { deleteEmail } from "../clients/mail.ts";
 import { resolveConfig } from "../config.ts";
 import type { DeleteParams } from "../types.ts";
 
@@ -16,7 +16,9 @@ export const EmailDeleteTool = {
     profile: Type.Optional(
       Type.String({ description: "Profile name to use. Uses active profile if omitted." }),
     ),
-    uid: Type.Number({ description: "Email UID to delete" }),
+    uid: Type.Union([Type.Number(), Type.String()], {
+      description: "Email UID to delete (numeric IMAP UID, or the message id string for Microsoft Graph profiles)",
+    }),
     mailbox: Type.Optional(
       Type.String({ description: "Mailbox name, defaults to INBOX" }),
     ),
@@ -30,15 +32,17 @@ export const EmailDeleteTool = {
     const config = resolveConfig(params.profile);
     const mailbox = params.mailbox || "INBOX";
 
-    const { expunged } = await deleteEmail(config, params.uid, mailbox, signal);
+    const { expunged, movedTo } = await deleteEmail(config, params.uid, mailbox, signal);
 
-    const text = expunged
+    const text = movedTo
+      ? `Email ${params.uid} moved to "${movedTo}" (recoverable from there).`
+      : expunged
       ? `Email UID ${params.uid} permanently deleted from "${mailbox}".`
       : `Email UID ${params.uid} marked as deleted in "${mailbox}". The server does not support UID EXPUNGE, so it was not expunged -- it disappears when the mailbox is next expunged by your mail client.`;
 
     return {
       content: [{ type: "text" as const, text }],
-      details: { uid: params.uid, mailbox, expunged },
+      details: { uid: params.uid, mailbox, expunged, ...(movedTo && { movedTo }) },
     };
   },
 };

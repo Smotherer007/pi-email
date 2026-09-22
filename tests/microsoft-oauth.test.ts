@@ -17,7 +17,8 @@ import {
   usernameFromIdToken,
   type FetchLike,
 } from "../src/oauth/microsoft.ts";
-import { buildMicrosoftProfile, parseLoginArgs } from "../src/commands/microsoft-login.ts";
+import { buildMicrosoftProfile, parseLoginArgs, resolveApi } from "../src/commands/microsoft-login.ts";
+import { scopesFor } from "../src/oauth/microsoft.ts";
 import { allowXoauth2DespiteLoginDisabled } from "../src/clients/imap-client.ts";
 
 const testHome = path.join(os.tmpdir(), "pi-email-oauth-test-" + process.pid);
@@ -280,5 +281,37 @@ describe("allowXoauth2DespiteLoginDisabled", () => {
     assert.equal(fake.serverSupports("LOGINDISABLED"), false);
     assert.equal(fake.serverSupports("AUTH=XOAUTH2"), true);
     assert.equal(fake.serverSupports("MOVE"), false);
+  });
+});
+
+describe("Graph vs IMAP selection", () => {
+  it("requests Graph or Outlook scopes, never both", () => {
+    assert.match(scopesFor("graph"), /graph\.microsoft\.com\/Mail\.ReadWrite/);
+    assert.match(scopesFor("graph"), /graph\.microsoft\.com\/Mail\.Send/);
+    assert.doesNotMatch(scopesFor("graph"), /outlook\.office\.com/);
+    assert.match(scopesFor("outlook"), /IMAP\.AccessAsUser\.All/);
+    assert.doesNotMatch(scopesFor("outlook"), /graph\.microsoft\.com/);
+  });
+
+  it("defaults to Graph; --imap or PI_EMAIL_MS_API=outlook selects IMAP", () => {
+    assert.equal(parseLoginArgs("neo --imap").api, "outlook");
+    assert.equal(resolveApi(undefined, undefined), "graph");
+    assert.equal(resolveApi(undefined, "outlook"), "outlook");
+    assert.equal(resolveApi("graph", "outlook"), "graph");
+  });
+
+  it("builds a Graph profile", () => {
+    const cfg = buildMicrosoftProfile({
+      email: "neo@firma.de",
+      clientId: "cid",
+      tenant: "organizations",
+      refreshToken: "RT",
+      accessToken: "AT",
+      expiresAt: 1,
+      api: "graph",
+    });
+    assert.equal(cfg.oauth?.api, "graph");
+    assert.equal(cfg.imap.host, "graph.microsoft.com");
+    assert.equal(cfg.appendToSent, false);
   });
 });

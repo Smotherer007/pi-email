@@ -42,6 +42,12 @@ export interface OAuthConfig {
   readonly clientId: string;
   /** Entra ID tenant: "organizations", "common", a tenant id or domain. */
   readonly tenant: string;
+  /**
+   * Which Microsoft API the tokens are for. "graph" reads and sends mail via
+   * Microsoft Graph (works with IMAP/SMTP AUTH disabled); "outlook" (the
+   * default for older profiles) uses IMAP/SMTP with XOAUTH2.
+   */
+  readonly api?: "graph" | "outlook";
   readonly refreshToken: string;
   readonly accessToken?: string;
   /** Access token expiry, epoch milliseconds. */
@@ -71,8 +77,14 @@ export interface EmailProfiles {
 
 // Domain
 
+/**
+ * Message identifier: a numeric IMAP UID, or an opaque Microsoft Graph
+ * message id for Graph profiles.
+ */
+export type MessageUid = number | string;
+
 export interface EmailHeader {
-  readonly uid: number;
+  readonly uid: MessageUid;
   readonly from: string;
   readonly to: string;
   readonly cc: string;
@@ -83,7 +95,7 @@ export interface EmailHeader {
 }
 
 export interface EmailBody {
-  readonly uid: number;
+  readonly uid: MessageUid;
   readonly from: string;
   readonly to: string;
   readonly cc: string;
@@ -139,7 +151,7 @@ export class EmailNotConfiguredError extends Error {
 
 /** Thrown when a UID does not exist in the given mailbox. */
 export class EmailNotFoundError extends Error {
-  constructor(uid: number, mailbox: string) {
+  constructor(uid: MessageUid, mailbox: string) {
     super(`No email with UID ${uid} found in "${mailbox}".`);
     this.name = "EmailNotFoundError";
   }
@@ -183,7 +195,7 @@ export interface FetchParams {
 
 export interface ReadParams {
   profile?: string;
-  uid: number;
+  uid: MessageUid;
   mailbox?: string;
   downloadDir?: string;
 }
@@ -217,13 +229,13 @@ export interface SendParams {
 
 export interface DeleteParams {
   profile?: string;
-  uid: number;
+  uid: MessageUid;
   mailbox?: string;
 }
 
 export interface MoveParams {
   profile?: string;
-  uid: number;
+  uid: MessageUid;
   destination: string;
   source?: string;
 }
